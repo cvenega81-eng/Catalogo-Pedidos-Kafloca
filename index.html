@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo KAFLOCA STORE</title>
+    <style>
+        :root {
+            --primary: #D4AF37; /* Dorado */
+            --dark: #2c2c2c;
+            --gray: #f5f5f5;
+            --whatsapp: #25D366;
+        }
+        body { font-family: 'Helvetica Neue', sans-serif; background: var(--gray); margin: 0; padding-bottom: 100px; }
+        
+        /* Encabezado */
+        header { background: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { margin: 0; color: var(--dark); letter-spacing: 2px; }
+        .subtitle { color: var(--primary); font-weight: bold; margin-top: 5px; }
+        
+        /* Filtros */
+        .category-scroll { display: flex; overflow-x: auto; padding: 15px; gap: 10px; background: white; border-bottom: 1px solid #eee; }
+        .cat-btn { white-space: nowrap; padding: 8px 20px; border: 1px solid #ddd; border-radius: 20px; background: white; cursor: pointer; transition: 0.3s; }
+        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Grilla de Productos */
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+        /* Tarjeta */
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        
+        .image-container { width: 100%; height: 280px; background: #eee; position: relative; overflow: hidden; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
+        
+        /* Placeholder por si no hay imagen */
+        .no-image { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f0f0f0; color: #888; text-align: center; padding: 20px; }
+        
+        .card-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .code-tag { background: var(--dark); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; align-self: flex-start; margin-bottom: 8px; }
+        .product-name { font-size: 1.1rem; font-weight: bold; margin: 0 0 5px 0; color: var(--dark); }
+        .product-desc { font-size: 0.85rem; color: #666; margin-bottom: 15px; line-height: 1.4; flex-grow: 1; }
+        
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 15px; border-top: 1px solid #eee; }
+        .price { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+        .add-btn { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .add-btn:hover { background: var(--primary); transform: scale(1.05); }
+
+        /* Botón Flotante y Modal */
+        .cart-float { position: fixed; bottom: 30px; right: 30px; background: var(--whatsapp); color: white; padding: 15px 30px; border-radius: 50px; font-weight: bold; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); cursor: pointer; display: flex; align-items: center; gap: 10px; z-index: 999; transition: transform 0.3s; }
+        .cart-float:hover { transform: scale(1.05); }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 500px; border-radius: 15px; padding: 25px; max-height: 90vh; overflow-y: auto; position: relative; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .cart-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .form-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-submit { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>KAFLOCA STORE</h1>
+    <div class="subtitle">Catálogo de Joyería Acero Inoxidable</div>
+</header>
+
+<div class="category-scroll">
+    <button class="cat-btn active" onclick="filter('all')">Todos</button>
+    <button class="cat-btn" onclick="filter('Anillo')">Anillos</button>
+    <button class="cat-btn" onclick="filter('Aretes')">Aretes</button>
+    <button class="cat-btn" onclick="filter('Collar')">Collares</button>
+    <button class="cat-btn" onclick="filter('Pulsera')">Pulseras</button>
+    <button class="cat-btn" onclick="filter('Set')">Conjuntos</button>
+</div>
+
+<div class="container">
+    <div class="grid" id="grid"></div>
+</div>
+
+<div class="cart-float" onclick="toggleModal()">
+    <span>🛒 Ver Pedido (<span id="cart-count">0</span>)</span>
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <span onclick="toggleModal()" style="float:right; cursor:pointer; font-size:1.5rem;">&times;</span>
+        <h2>Tu Pedido</h2>
+        <div id="cart-items"></div>
+        <h3 style="text-align:right; color:var(--primary)">Total: ₡<span id="total">0</span></h3>
+        
+        <hr>
+        <h4>Datos de Envío</h4>
+        <input type="text" id="name" class="form-input" placeholder="Tu Nombre">
+        <input type="tel" id="phone" class="form-input" placeholder="Tu Teléfono">
+        <textarea id="address" class="form-input" placeholder="Dirección o notas"></textarea>
+        
+        <button class="btn-submit" style="background:var(--whatsapp); color:white;" onclick="send('whatsapp')">📱 Enviar a WhatsApp</button>
+        <button class="btn-submit" style="background:#333; color:white;" onclick="send('email')">✉️ Enviar a Correo</button>
+    </div>
+</div>
+
+<script>
+    // Configuración
+    const PHONE = "50684107482"; 
+    const EMAIL = "floryta_81@hotmail.com"; 
+
+    // BASE DE DATOS COMPLETA (Precios corregidos y descripciones agregadas)
+    const products = [
+        // ANILLOS
+        {id:"AN-01", n:"Anillo Geo Verde", p:3500, d:"Acero inox 304, chapado oro 18k, resistente al agua. Color verde.", c:"Anillo"},
+        {id:"AN-02", n:"Anillo Geo Oro", p:2500, d:"Acero inox 316, recubrimiento PVD geométrico, resistente al deslustre.", c:"Anillo"},
+        {id:"AN-03", n:"Anillo Geo Beige", p:3500, d:"Acero inox 304, chapado oro 18k. Color beige.", c:"Anillo"},
+        {id:"AN-04", n:"Anillo Geo Burdeos", p:3500, d:"Acero inox 304, chapado oro 18k. Color burdeos.", c:"Anillo"},
+        {id:"AN-05", n:"Anillo Perla Blanca", p:2200, d:"Acero inox 304, recubrimiento IP perla blanca. Resistente al agua.", c:"Anillo"},
+        {id:"AN-06", n:"Anillo Ojo Tigre", p:3500, d:"Acero inox 304, chapado oro, perla ojo de tigre.", c:"Anillo"},
+        {id:"AN-07", n:"Anillo Perla Oro", p:3500, d:"Acero inox 304, chapado oro auténtico, perla blanca.", c:"Anillo"},
+        {id:"AN-08", n:"Anillo Abierto PVD", p:2000, d:"Anillo abierto acero 304 PVD, chapado oro 18k.", c:"Anillo"},
+        {id:"AN-09", n:"Anillo Concha", p:1500, d:"Diseño de concha, dorado, acero inoxidable.", c:"Anillo"},
+        {id:"AN-10", n:"Anillo Abierto Perla", p:3000, d:"Acero 304 PVD con perla. Resistente al agua.", c:"Anillo"},
+        {id:"AN-11", n:"Anillo Ostra", p:2500, d:"Forma de ostra con perla, acero inoxidable.", c:"Anillo"},
+        {id:"AN-12", n:"Anillo Leopardo", p:3500, d:"Ajustable, diseño geométrico estampado leopardo.", c:"Anillo"},
+        {id:"AN-14", n:"Anillo Abierto 18k", p:2500, d:"Acero 304 PVD chapado oro 18k. Resistente al agua.", c:"Anillo"},
+        {id:"AN-15", n:"Anillo Corazón", p:2000, d:"Corazón abierto, acero 304 PVD. Resistente al agua.", c:"Anillo"},
+        {id:"AN-16", n:"Anillo Resina", p:3000, d:"Centro de resina, chapado oro 18k, electrochapado al vacío.", c:"Anillo"},
+        {id:"AN-17", n:"Anillo Corazón Ajust", p:2500, d:"Corazón abierto ajustable, acero inox 304.", c:"Anillo"},
+        {id:"AN-20", n:"Anillo Flor Blanca", p:2000, d:"Anillo abierto de flor blanca, acero 304.", c:"Anillo"},
+        {id:"AN-24", n:"Anillo Oro 18k", p:2500, d:"Acero 304 PVD chapado oro auténtico 18k.", c:"Anillo"},
+        {id:"AN-26", n:"Anillo Blanco Peq", p:2200, d:"Anillo abierto blanco, acero 304, pequeño.", c:"Anillo"},
+        
+        // ARETES
+        {id:"AR-01", n:"Aretes Corazón", p:2000, d:"Acero inoxidable con pintura de oro 18k.", c:"Aretes"},
+        {id:"AR-02", n:"Aretes Diamantes", p:3000, d:"Corazón con incrustaciones de zirconia.", c:"Aretes"},
+        {id:"AR-05", n:"Aretes Rosario", p:2500, d:"Acero 304 chapado 18k. Grandes.", c:"Aretes"},
+        {id:"AR-06", n:"Aretes Lechuguilla", p:2500, d:"Acero 316L, circón chapado oro 18k. Plateados.", c:"Aretes"},
+        {id:"AR-08", n:"Aretes Flor Perla", p:2300, d:"Flor de cuatro pétalos con perla. Grandes.", c:"Aretes"},
+        {id:"AR-09", n:"Aretes Lazo Peq", p:2000, d:"Forma de lazo con perla. Pequeños.", c:"Aretes"},
+        {id:"AR-10", n:"Aretes Palmera", p:2300, d:"Forma de palmera con perla. Grandes.", c:"Aretes"},
+        {id:"AR-11", n:"Aretes Asimétricos", p:2500, d:"Acero y resina estilo asimétrico dorado.", c:"Aretes"},
+        {id:"AR-14", n:"Aretes Pulpo", p:2300, d:"Forma de pulpo con perlas ovaladas.", c:"Aretes"},
+        {id:"AR-17", n:"Aretes Lazo Gde", p:2300, d:"Forma de lazo con perla. Grandes.", c:"Aretes"},
+        {id:"AR-18", n:"Aretes Gota PVD", p:2000, d:"Acero 304 PVD chapado oro auténtico.", c:"Aretes"},
+        {id:"AR-19", n:"Aretes Corazón Perla", p:2300, d:"Forma de corazón con perla. Grandes.", c:"Aretes"},
+        {id:"AR-20", n:"Aretes Aro C", p:2500, d:"Forma de C, chapados en oro 18k. Grandes.", c:"Aretes"},
+        {id:"AR-21", n:"Aretes Lazo Colgante", p:2000, d:"Lazo acero 304 PVD con perla colgante.", c:"Aretes"},
+        {id:"AR-22", n:"Aretes Púa", p:2300, d:"Acero inoxidable 304.", c:"Aretes"},
+        {id:"AR-24", n:"Aretes Argolla Corazón", p:2000, d:"Colgante de corazón PVD oro auténtico.", c:"Aretes"},
+        {id:"AR-26", n:"Aretes Flor Negra", p:2000, d:"Flor negra acero 304 IP oro 18k.", c:"Aretes"},
+        {id:"AR-27", n:"Aretes Peach", p:2000, d:"Acero inoxidable 304.", c:"Aretes"},
+        {id:"AR-28", n:"Aretes Nido", p:2300, d:"Forma de nido con perla. Grandes.", c:"Aretes"},
+        {id:"AR-31", n:"Aretes Mármol Blanco", p:2500, d:"Resina chapada oro 18k, incrustado mármol.", c:"Aretes"},
+        {id:"AR-35", n:"Aretes Tulipán", p:1500, d:"Enchapado acero titanio, oro 18k PVD.", c:"Aretes"},
+        {id:"AR-39", n:"Aretes Fresa", p:2000, d:"Acero inoxidable 304.", c:"Aretes"},
+        {id:"AR-40", n:"Aretes Argolla Perla", p:2000, d:"Colgante de perla PVD oro auténtico.", c:"Aretes"},
+        {id:"AR-44", n:"Aretes Margarita", p:1500, d:"Acero 304 PVD oro auténtico.", c:"Aretes"},
+        {id:"AR-48", n:"Aretes Chunky", p:4000, d:"Bolita chunky de acero 304.", c:"Aretes"},
+        {id:"AR-54", n:"Aretes Maxi Verde", p:3500, d:"Maximalistas IP oro 18k. Color Verde.", c:"Aretes"},
+        {id:"AR-60", n:"Aretes Gota", p:2000, d:"Forma de gota acero inoxidable.", c:"Aretes"},
+        
+        // COLLARES
+        {id:"CA-01", n:"Collar 3 Capas", p:3000, d:"Color sólido, PVD oro 18k.", c:"Collar"},
+        {id:"CA-02", n:"Collar 2 Capas", p:3500, d:"Cadena acero 304 PVD oro 18k.", c:"Collar"},
+        {id:"CA-05", n:"Collar Tulipán", p:2000, d:"Dije tulipán acero 304 PVD oro 18k.", c:"Collar"},
+        {id:"CA-09", n:"Collar Corazón", p:3500, d:"Incrustaciones diamantes zirconia.", c:"Collar"},
+        {id:"CA-12", n:"Cadena Rombos", p:3000, d:"Doble capa, acero 316 oro 18k.", c:"Collar"},
+        {id:"CA-17", n:"Collar Perla", p:3000, d:"Acero 304 chapado en oro con perla.", c:"Collar"},
+
+        // PULSERAS / TOBILLERAS
+        {id:"BR-01", n:"Brazalete PVD", p:2500, d:"Acero 304 chapado oro auténtico.", c:"Pulsera"},
+        {id:"PU-01", n:"Pulsera Acero", p:2500, d:"Acero inoxidable 304.", c:"Pulsera"},
+        {id:"PU-10", n:"Pulsera Titanio", p:3000, d:"Acero titanio PVD oro 18k.", c:"Pulsera"},
+        {id:"TO-01", n:"Tobillera PVD", p:2000, d:"Acero 304 PVD oro 18k.", c:"Pulsera"},
+        {id:"TO-05", n:"Tobillera Corazón", p:2500, d:"Tobillera doble con corazón.", c:"Pulsera"},
+
+        // SETS
+        {id:"CO-01", n:"Set Perla Gota", p:3500, d:"3 piezas (aretes y cadena) dije perla.", c:"Set"},
+        {id:"CO-02", n:"Set Resina 18k", p:4500, d:"3 piezas, acero 304 IP resina oro 18k.", c:"Set"},
+        {id:"CO-04", n:"Set Cadena Pulsera", p:5000, d:"2 piezas acero 316 oro 18k.", c:"Set"},
+        {id:"CO-05", n:"Set Corazón Doble", p:4500, d:"Collar y pulsera chapado oro 18k.", c:"Set"},
+        {id:"CO-07", n:"Set Flor Negra", p:2500, d:"3 piezas flor negra gota de aceite.", c:"Set"},
+        {id:"CO-08", n:"Set Flor Blanca", p:2500, d:"3 piezas flor blanca gota de aceite.", c:"Set"}
+    ];
+
+    let cart = [];
+
+    // Cargar productos
+    function render(category = 'all') {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        
+        const filtered = category === 'all' ? products : products.filter(p => p.c.includes(category));
+        
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            // Intenta cargar imagen, si falla muestra placeholder
+            const imgPath = `img/${p.id}.jpg`;
+            
+            card.innerHTML = `
+                <div class="image-container">
+                    <img src="${imgPath}" class="card-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div class="no-image" style="display:none">
+                        <span style="font-size:2rem">💎</span>
+                        <p>${p.id}</p>
+                        <small>Sin imagen</small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <span class="code-tag">${p.id}</span>
+                    <h3 class="product-name">${p.n}</h3>
+                    <p class="product-desc">${p.d}</p>
+                    <div class="price-row">
+                        <span class="price">₡${p.p.toLocaleString()}</span>
+                        <button class="add-btn" onclick="add('${p.id}')">Agregar</button>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        
+        // Actualizar botones filtro
+        document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+        event ? event.target.classList.add('active') : document.querySelector('.cat-btn').classList.add('active');
+    }
+
+    function filter(cat) { render(cat); }
+
+    function add(id) {
+        const p = products.find(i => i.id === id);
+        cart.push(p);
+        updateCart();
+        alert(`¡${p.n} agregado!`);
+    }
+
+    function remove(index) {
+        cart.splice(index, 1);
+        updateCart();
+    }
+
+    function updateCart() {
+        document.getElementById('cart-count').innerText = cart.length;
+        const total = cart.reduce((sum, i) => sum + i.p, 0);
+        document.getElementById('total').innerText = total.toLocaleString();
+        
+        const container = document.getElementById('cart-items');
+        if(cart.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#999">Carrito vacío</p>';
+        } else {
+            container.innerHTML = cart.map((item, i) => `
+                <div class="cart-item">
+                    <div>
+                        <strong>${item.n}</strong><br>
+                        <small>${item.id}</small>
+                    </div>
+                    <div>
+                        ₡${item.p.toLocaleString()} 
+                        <span onclick="remove(${i})" style="color:red; cursor:pointer; margin-left:10px">🗑️</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    function toggleModal() {
+        const modal = document.getElementById('modal');
+        modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function send(method) {
+        if(cart.length === 0) return alert("El carrito está vacío");
+        const name = document.getElementById('name').value;
+        if(!name) return alert("Por favor escribe tu nombre");
+        
+        const phone = document.getElementById('phone').value;
+        const addr = document.getElementById('address').value;
+        const total = document.getElementById('total').innerText;
+
+        let msg = `Hola KAFLOCA STORE, soy ${name}. Quiero pedir:\n\n`;
+        cart.forEach(i => msg += `▪ [${i.id}] ${i.n} - ₡${i.p.toLocaleString()}\n`);
+        msg += `\n*TOTAL: ₡${total}*`;
+        if(phone) msg += `\nTel: ${phone}`;
+        if(addr) msg += `\nDirección: ${addr}`;
+
+        if(method === 'whatsapp') window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
+        else window.location.href = `mailto:${EMAIL}?subject=Pedido ${name}&body=${encodeURIComponent(msg)}`;
+    }
+
+    // Iniciar
+    render();
+</script>
+
+</body>
+</html>
