@@ -6,434 +6,491 @@
     <title>Catálogo KAFLOCA STORE</title>
     <style>
         :root {
-            --primary: #D4AF37; /* Dorado */
-            --dark: #222;
-            --light: #f4f4f4;
-            --whatsapp: #25D366;
-            --discount: #e74c3c;
+            --primary: #D4AF37; /* Dorado elegante */
+            --dark: #1a1a1a;
+            --light: #f9f9f9;
+            --success: #25D366; /* Verde WhatsApp */
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--light); margin: 0; padding-bottom: 100px; color: var(--dark); }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--light); margin: 0; padding-bottom: 80px; color: var(--dark); }
         
         /* Header */
-        header { background: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        h1 { margin: 0; letter-spacing: 1px; text-transform: uppercase; font-size: 1.5rem; }
-        .subtitle { color: var(--primary); font-weight: 600; margin-top: 5px; }
+        header { background: white; padding: 20px 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        h1 { margin: 0; font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase; }
+        .subtitle { color: var(--primary); font-weight: 600; margin-top: 5px; font-size: 0.9rem; }
         
-        /* Categorías */
+        /* Navegación de Categorías */
         .nav-scroller { display: flex; overflow-x: auto; gap: 10px; padding: 15px; background: white; border-bottom: 1px solid #eee; -webkit-overflow-scrolling: touch; }
-        .cat-btn { padding: 8px 20px; border: 1px solid #ddd; border-radius: 20px; background: white; cursor: pointer; white-space: nowrap; transition: 0.3s; }
-        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .cat-btn {
+            border: 1px solid #ddd; background: white; padding: 8px 18px; border-radius: 20px; 
+            cursor: pointer; white-space: nowrap; font-size: 0.9rem; transition: all 0.3s ease;
+        }
+        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
 
-        /* Grilla */
+        /* Contenedor Principal */
         .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        
+        /* Grilla de Productos */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Tarjetas adaptables */
+            gap: 15px;
+        }
+        @media(min-width: 768px) { .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; } }
 
-        /* Tarjeta */
-        .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: transform 0.2s; height: 100%; }
-        .card:hover { transform: translateY(-5px); }
+        /* Tarjeta de Producto */
+        .card {
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05); transition: transform 0.2s;
+            display: flex; flex-direction: column; height: 100%;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         
-        .img-wrapper { position: relative; width: 100%; height: 250px; background: #eee; overflow: hidden; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; }
-        .no-img { display: flex; align-items: center; justify-content: center; height: 100%; color: #999; flex-direction: column; }
+        .card-img-wrapper {
+            position: relative; width: 100%; padding-top: 100%; /* Aspect ratio 1:1 */
+            background: #f0f0f0; overflow: hidden;
+        }
+        .card-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; transition: opacity 0.3s;
+        }
         
-        .card-body { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
-        .code { font-size: 0.75rem; color: #888; font-weight: bold; background: #eee; padding: 2px 6px; border-radius: 4px; align-self: flex-start; margin-bottom: 8px; }
-        .name { font-size: 1.1rem; font-weight: 700; margin: 0 0 8px 0; line-height: 1.2; }
-        .desc { font-size: 0.85rem; color: #666; margin-bottom: 15px; line-height: 1.4; flex-grow: 1; }
+        /* Placeholder por si falta imagen */
+        .no-img-placeholder {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #aaa; background: #eee;
+        }
+
+        .card-info { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-code { font-size: 0.75rem; color: #888; font-weight: bold; margin-bottom: 4px; }
+        .card-title { font-size: 1rem; margin: 0 0 5px; line-height: 1.3; color: var(--dark); }
+        .card-desc { font-size: 0.8rem; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
         
-        .footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 15px; }
-        .price { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
-        .add-btn { background: var(--dark); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
+        .price { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .add-btn {
+            background: var(--dark); color: white; border: none; width: 35px; height: 35px;
+            border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex;
+            align-items: center; justify-content: center; transition: background 0.2s;
+        }
         .add-btn:hover { background: var(--primary); }
 
-        /* Botón Flotante */
-        .fab { position: fixed; bottom: 30px; right: 30px; background: var(--whatsapp); color: white; padding: 15px 25px; border-radius: 50px; font-weight: bold; box-shadow: 0 5px 20px rgba(0,0,0,0.2); cursor: pointer; z-index: 900; display: flex; align-items: center; gap: 10px; transition: transform 0.2s; }
-        .fab:hover { transform: scale(1.05); }
+        /* Botón Flotante Carrito */
+        .fab-cart {
+            position: fixed; bottom: 25px; right: 25px; background: var(--primary); color: white;
+            padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 10px;
+            z-index: 1000; animation: popIn 0.3s;
+        }
+        @keyframes popIn { from {transform: scale(0);} to {transform: scale(1);} }
 
         /* Modal */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-box { background: white; width: 90%; max-width: 500px; padding: 25px; border-radius: 15px; max-height: 90vh; overflow-y: auto; position: relative; }
-        
-        .cart-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .promo-banner { background: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 0.9rem; text-align: center; border: 1px solid #ffeeba; }
-        .promo-success { background: #d4edda; color: #155724; border-color: #c3e6cb; }
-        
-        .totals-area { background: #fafafa; padding: 15px; border-radius: 8px; margin: 15px 0; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.95rem; }
-        .total-final { font-size: 1.3rem; font-weight: bold; color: var(--primary); border-top: 1px solid #ddd; padding-top: 5px; margin-top: 5px; }
-        .discount-text { color: var(--discount); }
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end; justify-content: center;
+        }
+        @media(min-width: 768px) { .modal-overlay { align-items: center; } }
 
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0 15px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .btn-send { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 5px; }
+        .modal-content {
+            background: white; width: 100%; max-width: 500px; padding: 25px;
+            border-radius: 20px 20px 0 0; max-height: 85vh; overflow-y: auto;
+            position: relative; animation: slideUp 0.3s;
+        }
+        @media(min-width: 768px) { .modal-content { border-radius: 15px; } }
+        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
+
+        .cart-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .cart-item-info strong { display: block; font-size: 0.95rem; }
+        .cart-item-info small { color: #888; }
+        .remove-link { color: #ff4d4d; font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
+        
+        .btn-block { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .btn-whatsapp { background: var(--success); color: white; }
+        .btn-email { background: #333; color: white; }
+        
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #999; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>KAFLOCA STORE</h1>
-    <div class="subtitle">Catálogo de Joyería Acero Inoxidable</div>
+    <div class="subtitle">Catálogo Digital</div>
 </header>
 
 <div class="nav-scroller">
-    <button class="cat-btn active" onclick="filter('all')">Todos</button>
-    <button class="cat-btn" onclick="filter('Anillos')">Anillos</button>
-    <button class="cat-btn" onclick="filter('Aretes')">Aretes</button>
-    <button class="cat-btn" onclick="filter('Collares')">Collares</button>
-    <button class="cat-btn" onclick="filter('Pulseras')">Pulseras</button>
-    <button class="cat-btn" onclick="filter('Sets')">Conjuntos</button>
+    <button class="cat-btn active" onclick="filterProducts('all')">Todos</button>
+    <button class="cat-btn" onclick="filterProducts('Anillos')">Anillos</button>
+    <button class="cat-btn" onclick="filterProducts('Aretes')">Aretes</button>
+    <button class="cat-btn" onclick="filterProducts('Collares')">Collares</button>
+    <button class="cat-btn" onclick="filterProducts('Pulseras')">Pulseras</button>
+    <button class="cat-btn" onclick="filterProducts('Tobilleras')">Tobilleras</button>
+    <button class="cat-btn" onclick="filterProducts('Sets')">Conjuntos</button>
 </div>
 
 <div class="container">
-    <div class="grid" id="grid"></div>
+    <div class="product-grid" id="grid">
+        </div>
 </div>
 
-<div class="fab" onclick="toggleCart()">
-    <span>🛒</span> <span id="cart-badge">0</span>
+<div class="fab-cart" onclick="toggleCart()">
+    <span>🛒</span>
+    <span id="cart-total-badge">₡0</span>
 </div>
 
-<div class="modal-overlay" id="modal">
-    <div class="modal-box">
-        <span onclick="toggleCart()" style="float:right; cursor:pointer; font-size:1.5rem">&times;</span>
-        <h2>Tu Pedido</h2>
+<div class="modal-overlay" id="cart-modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="toggleCart()">&times;</span>
+        <h2 style="margin-top: 0">Tu Pedido</h2>
         
-        <div id="cart-list"></div>
-        
-        <div id="promo-msg" class="promo-banner">
-            ¡Agrega 5 productos o más para obtener 20% de descuento!
+        <div id="cart-list">
+            <p style="text-align: center; color: #999;">El carrito está vacío.</p>
         </div>
 
-        <div class="totals-area">
-            <div class="row">
-                <span>Subtotal:</span>
-                <span>₡<span id="subtotal">0</span></span>
-            </div>
-            <div class="row discount-text" id="discount-row" style="display:none;">
-                <span>Descuento (20%):</span>
-                <span>-₡<span id="discount-val">0</span></span>
-            </div>
-            <div class="row total-final">
-                <span>Total:</span>
-                <span>₡<span id="final-total">0</span></span>
-            </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0; font-size: 1.2rem; font-weight: bold;">
+            <span>Total:</span>
+            <span style="color: var(--primary);">₡<span id="cart-final-total">0</span></span>
         </div>
 
-        <h3>Datos de Envío</h3>
-        <input type="text" id="name" placeholder="Tu Nombre Completo">
-        <input type="tel" id="phone" placeholder="Teléfono">
-        <textarea id="address" placeholder="Dirección de envío / Notas"></textarea>
+        <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
 
-        <button class="btn-send" style="background:var(--whatsapp); color:white" onclick="checkout('whatsapp')">Enviar por WhatsApp</button>
-        <button class="btn-send" style="background:#333; color:white" onclick="checkout('email')">Enviar por Correo</button>
+        <div class="form-group">
+            <input type="text" id="client-name" class="form-control" placeholder="Tu Nombre Completo">
+        </div>
+        <div class="form-group">
+            <input type="tel" id="client-phone" class="form-control" placeholder="Teléfono / WhatsApp">
+        </div>
+        <div class="form-group">
+            <textarea id="client-address" class="form-control" placeholder="Dirección de Envío o Notas Adicionales" rows="2"></textarea>
+        </div>
+
+        <button class="btn-block btn-whatsapp" onclick="checkout('whatsapp')">Enviar Pedido por WhatsApp</button>
+        <button class="btn-block btn-email" onclick="checkout('email')">Enviar Pedido por Correo</button>
     </div>
 </div>
 
 <script>
-    const CONFIG = {
-        whatsapp: "50684107482", 
-        email: "floryta_81@hotmail.com", // CAMBIA ESTO
-        discountThreshold: 5, // Cantidad para activar descuento
-        discountRate: 0.20    // 20%
-    };
-
-    /* BASE DE DATOS DE PRODUCTOS
-       [cite_start]Descripciones copiadas textualmente del PDF [cite: 1-152] */
+    /* =====================================================
+       CONFIGURACIÓN DE LA TIENDA
+       ===================================================== */
+    const STORE_WHATSAPP = "50684107482"; // Número sin símbolos
+    const STORE_EMAIL = "floryta_81@hotmail.com"; // Tu correo real
+    
+    // BASE DE DATOS COMPLETA DE PRODUCTOS
+    // Nota: Se han corregido precios erróneos (ej: 43500 -> 3500)
     const products = [
-        [cite_start]// ANILLOS [cite: 2-9]
-        {id:"AN-01", n:"Anillo Geo Verde", p:3500, c:"Anillos", d:"Anillo de acero inoxidable 304, con recubrimiento de iones (IP) chapado en oro auténtico 18k, geométrico estilo IG resistente al agua y al deslustre. Color verde"},
-        {id:"AN-02", n:"Anillo Geo Oro", p:2500, c:"Anillos", d:"Anillo de acero inoxidble 316, chapado en oro auténtico y recubrimiento PVD geométrico, resistente al agua y al deslustre."},
-        {id:"AN-03", n:"Anillo Geo Beige", p:3500, c:"Anillos", d:"Anillo de acero inoxidable 304, con recubrimiento de iones (IP) chapado en oro auténtico 18k, geométrico estilo IG resistente al agua y al deslustre. Color beige"},
-        {id:"AN-04", n:"Anillo Geo Burdeos", p:3500, c:"Anillos", d:"Anillo de acero inoxidable 304, con recubrimiento de iones (IP) chapado en oro auténtico 18k, geométrico estilo IG resistente al agua y al deslustre. Color burdeos"},
-        {id:"AN-05", n:"Anillo Perla Blanca", p:2200, c:"Anillos", d:"Anillo de acero inoxidable 304, recubrimiento de iones (IP) perla blanca. Resistente al agua y al deslustre."},
-        {id:"AN-06", n:"Anillo Ojo de Tigre", p:3500, c:"Anillos", d:"Anillo de acero inoxidable 304, chapado en oro auténtico. Recubrimiento de iones (IP) perla ojo de tigre. Resistente al agua y al deslustre."},
-        {id:"AN-07", n:"Anillo Perla Oro", p:3500, c:"Anillos", d:"Anillo de acero inoxidable 304, chapado en oro auténtico. Recubrimiento de iones (IP) perla blanca. Resistente al agua y al deslustre."},
-        {id:"AN-08", n:"Anillo Abierto 18k", p:2000, c:"Anillos", d:"Anillo abierto de acero inoxidable 304 con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"AN-09", n:"Anillo Concha", p:1500, c:"Anillos", d:"Anillo de acero inoxidable con diseño de concha, dorado."},
-        {id:"AN-10", n:"Anillo Abierto Perla", p:3000, c:"Anillos", d:"Anillo abierto con perla de acero inoxidable 304 con recubrimiento PVD. Resistente al agua y al deslustre."},
-        {id:"AN-11", n:"Anillo Ostra", p:2500, c:"Anillos", d:"Anillo de acero inoxidable, en forma de ostra con perla."},
-        {id:"AN-12", n:"Anillo Leopardo", p:3500, c:"Anillos", d:"Anillo Ajustable De Acero Inoxidable Con Diseño Geométrico Y Estampado De Leopardo."},
-        {id:"AN-13", n:"Anillo Leopardo II", p:3500, c:"Anillos", d:"Anillo Ajustable De Acero Inoxidable Con Diseño Geométrico Y Estampado De Leopardo."},
-        {id:"AN-14", n:"Anillo Abierto PVD", p:2500, c:"Anillos", d:"Anillo abierto de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"AN-15", n:"Anillo Corazón Abierto", p:2000, c:"Anillos", d:"Anillo corazón abierto de Acero inoxidable 304 con recubrimiento PVD. Resistente al agua y al deslustre."},
-        {id:"AN-16", n:"Anillo Resina", p:3000, c:"Anillos", d:"Anillo abierto de acero inoxidable 304 con centro de resina, chapado en oro de 18k. Electrochapado al vacío (en horno)."},
-        {id:"AN-17", n:"Anillo Corazón Ajustable", p:2500, c:"Anillos", d:"Anillo de corazón abierto ajustable de acero inoxidable 304."},
-        {id:"AN-18", n:"Anillo Puntos Rojos", p:2500, c:"Anillos", d:"Anillo abierto con puntos rojos de Acero Inoxidable 304."},
-        {id:"AN-19", n:"Anillo PVD Oro", p:2000, c:"Anillos", d:"Anillo abierto de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"AN-20", n:"Anillo Flor Blanca", p:2000, c:"Anillos", d:"Anillo abierto de flor blanca de acero inoxidable 304."},
-        {id:"AN-23", n:"Anillo Perlas Peq", p:2500, c:"Anillos", d:"Anillo abierto de perlas pequeñas de acero inoxidable 304."},
-        {id:"AN-24", n:"Anillo PVD Oro 18k", p:2500, c:"Anillos", d:"Anillo abierto de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"AN-25", n:"Anillo Ojo Gato", p:2500, c:"Anillos", d:"Anillo abierto ojo de gato de acero inoxidable 304."},
-        {id:"AN-26", n:"Anillo Blanco Peq", p:2200, c:"Anillos", d:"Anillo abierto blanco de acero inoxidable 304. Pequeño."},
-        {id:"AN-27", n:"Anillo Gotas Peq", p:2200, c:"Anillos", d:"Anillo abierto de gotas pequeñas de acero inoxidable 304."},
-        {id:"AN-28", n:"Anillo PVD 18k", p:2500, c:"Anillos", d:"Anillo abierto de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"AN-29", n:"Anillo PVD 18k II", p:2500, c:"Anillos", d:"Anillo abierto de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"AN-30", n:"Anillo Simple", p:2000, c:"Anillos", d:"Anillo abierto de acero inoxidable 304."},
-        {id:"AN-31", n:"Anillo Flor Blanca II", p:2200, c:"Anillos", d:"Anillo abierto de flor blanca de acero inoxidable 304."},
+        // ANILLOS
+        {id:"AN-01", n:"Anillo Geo Verde 18k", p:3500, c:"Anillos", d:"Acero 304, chapado oro 18k, resistente al agua."},
+        {id:"AN-02", n:"Anillo Geo Oro", p:2500, c:"Anillos", d:"Acero 316, PVD geométrico, resistente al deslustre."},
+        {id:"AN-03", n:"Anillo Geo Beige", p:3500, c:"Anillos", d:"Acero 304, chapado oro 18k, geométrico estilo IG."},
+        {id:"AN-04", n:"Anillo Geo Burdeos", p:3500, c:"Anillos", d:"Acero 304, chapado oro 18k, color burdeos."},
+        {id:"AN-05", n:"Anillo Perla Blanca IP", p:3200, c:"Anillos", d:"Acero 304, recubrimiento IP perla blanca."},
+        {id:"AN-06", n:"Anillo Ojo de Tigre", p:3500, c:"Anillos", d:"Acero 304, chapado oro, perla ojo de tigre."},
+        {id:"AN-07", n:"Anillo Perla Blanca Oro", p:3500, c:"Anillos", d:"Acero 304, chapado oro auténtico, perla blanca."},
+        {id:"AN-08", n:"Anillo Abierto PVD 18k", p:2000, c:"Anillos", d:"Acero 304 PVD, chapado oro 18k."},
+        {id:"AN-09", n:"Anillo Concha Dorado", p:1500, c:"Anillos", d:"Diseño de concha, acero inoxidable dorado."},
+        {id:"AN-10", n:"Anillo Abierto Perla", p:3000, c:"Anillos", d:"Acero 304 PVD con perla, resistente al agua."},
+        {id:"AN-11", n:"Anillo Ostra Perla", p:2500, c:"Anillos", d:"Forma de ostra con perla, acero inoxidable."},
+        {id:"AN-12", n:"Anillo Geo Leopardo", p:3500, c:"Anillos", d:"Ajustable, diseño geométrico estampado leopardo."},
+        {id:"AN-13", n:"Anillo Geo Leopardo II", p:3500, c:"Anillos", d:"Ajustable, diseño geométrico estampado leopardo."},
+        {id:"AN-14", n:"Anillo Abierto Oro", p:2500, c:"Anillos", d:"Acero 304 PVD, chapado oro auténtico 18k."},
+        {id:"AN-15", n:"Anillo Corazón Abierto", p:2000, c:"Anillos", d:"Acero 304 PVD, resistente al agua."},
+        {id:"AN-16", n:"Anillo Resina Oro", p:3000, c:"Anillos", d:"Centro resina, chapado oro 18k electrochapado."},
+        {id:"AN-17", n:"Anillo Corazón Ajustable", p:2500, c:"Anillos", d:"Corazón abierto ajustable, acero 304."},
+        {id:"AN-18", n:"Anillo Puntos Rojos", p:2500, c:"Anillos", d:"Anillo abierto con puntos rojos, acero 304."},
+        {id:"AN-19", n:"Anillo PVD Oro 18k", p:2000, c:"Anillos", d:"Acero 304 PVD, chapado oro 18k."},
+        {id:"AN-20", n:"Anillo Flor Blanca", p:2000, c:"Anillos", d:"Anillo abierto flor blanca, acero 304."},
+        {id:"AN-23", n:"Anillo Perlas Pequeñas", p:2500, c:"Anillos", d:"Anillo abierto de perlas pequeñas, acero 304."},
+        {id:"AN-24", n:"Anillo PVD Oro", p:2500, c:"Anillos", d:"Acero 304 PVD, chapado oro auténtico 18k."},
+        {id:"AN-25", n:"Anillo Ojo Gato", p:2500, c:"Anillos", d:"Anillo abierto ojo de gato, acero 304."},
+        {id:"AN-26", n:"Anillo Blanco Peq", p:2200, c:"Anillos", d:"Anillo abierto blanco, acero 304, pequeño."},
+        {id:"AN-27", n:"Anillo Gotas Peq", p:2200, c:"Anillos", d:"Anillo abierto gotas pequeñas, acero 304."},
+        {id:"AN-28", n:"Anillo PVD Oro II", p:2500, c:"Anillos", d:"Acero 304 PVD, chapado oro auténtico 18k."},
+        {id:"AN-29", n:"Anillo PVD Oro III", p:2500, c:"Anillos", d:"Acero 304 PVD, chapado oro auténtico 18k."},
+        {id:"AN-30", n:"Anillo Acero Simple", p:2000, c:"Anillos", d:"Anillo abierto de acero inoxidable 304."},
+        {id:"AN-31", n:"Anillo Flor Blanca II", p:2200, c:"Anillos", d:"Anillo abierto de flor blanca, acero 304."},
 
-        [cite_start]// ARETES [cite: 28-96]
-        {id:"AR-01", n:"Aretes Corazón", p:2000, c:"Aretes", d:"Aretes en forma de corazón, de acero inoxidable con pintura de oro 18k."},
-        {id:"AR-02", n:"Aretes Diamantes", p:3000, c:"Aretes", d:"Aretes en forma de corazón con incrustaciones de diamantes, accesorios de acero de titanio zirconia."},
-        {id:"AR-03", n:"Aretes Caramelo", p:3000, c:"Aretes", d:"Aretes de color caramelo, diseño minimalista vintage, geométricos, chapados en oro al vacío."},
-        {id:"AR-04", n:"Aretes Caramelo Osc", p:3000, c:"Aretes", d:"Aretes de color caramelo oscuro, diseño minimalista vintage, geométricos, chapados en oro al vacío."},
-        {id:"AR-05", n:"Aretes Rosario", p:2500, c:"Aretes", d:"Aretes Rosario de acero inoxidable 304, con recubrimiento de iones (IP) chapados en oro de 18k, resistente al agua y al deslustre. Grandes."},
-        {id:"AR-06", n:"Aretes Lechuguilla Pl", p:2500, c:"Aretes", d:"Aretes de acero inoxidable 316L, en forma de lechuguilla, con revestimiento al vacío, circón chapado en oro auténtico de 18k. Hecho a mano. Platedos."},
-        {id:"AR-07", n:"Aretes Lechuguilla Or", p:2750, c:"Aretes", d:"Aretes de acero inoxidable 316L, en forma de lechuguilla, con revestimiento al vacío, circón chapado en oro auténtico de 18k. Hecho a mano. Dorados."},
-        {id:"AR-08", n:"Aretes Flor 4 Pétalos", p:2300, c:"Aretes", d:"Aretes de acero inoxidable, en forma de flor de cuatro pétalos con perla. Grandes."},
-        {id:"AR-09", n:"Aretes Lazo Peq", p:2000, c:"Aretes", d:"Aretes de acero inoxidable, en forma de lazo con perla. Pequeños."},
-        {id:"AR-10", n:"Aretes Palmera", p:2300, c:"Aretes", d:"Aretes de acero inoxidable, en forma de palmera con perla. Grandes."},
-        {id:"AR-11", n:"Aretes Asimétricos", p:2500, c:"Aretes", d:"Aretes de acero inoxidable y resina estilo asimétrico dorado."},
-        {id:"AR-14", n:"Aretes Pulpo", p:2300, c:"Aretes", d:"Aretes de acero inoxidable en forma de pulpo con perlas ovaladas. Grandes."},
-        {id:"AR-15", n:"Aretes Óvalo", p:2300, c:"Aretes", d:"Aretes de acero inoxidable en forma de óvalo con perlas ovaladas. Grandes."},
-        {id:"AR-16", n:"Aretes Platillo", p:2300, c:"Aretes", d:"Aretes de acero inoxidable en forma de platillo con perlas ovaladas. Grandes."},
-        {id:"AR-17", n:"Aretes Lazo Gde", p:2300, c:"Aretes", d:"Aretes de acero inoxidable, en forma de lazo con perla. Grandes."},
-        {id:"AR-18", n:"Aretes Gota PVD", p:2000, c:"Aretes", d:"Aretes de acero inoxidable 304 en forma de gota con recubrimiento PVD chapado en oro auténtico. Resistente al agua y al deslustre."},
-        {id:"AR-19", n:"Aretes Corazón Perla", p:2300, c:"Aretes", d:"Aretes de acero inoxidable, en forma de corazón con perla. Grandes."},
-        {id:"AR-20", n:"Aretes Aro C", p:2500, c:"Aretes", d:"Aretes en aro en forma de C de Acero inoxidable 304 con recubrimiento de iones (IP), chapados en oro de 18k. Resistente al agua y al deslustre. Grandes."},
-        {id:"AR-21", n:"Aretes Lazo Colgante", p:2000, c:"Aretes", d:"Aretes en forma de lazo de acero inoxidable 304 con recubrimiento PVD chapado en oro auténtico, con perla colgante. Resistente al agua y al deslustre."},
-        {id:"AR-22", n:"Aretes Púa", p:2300, c:"Aretes", d:"Aretes Púa de acero inoxidable 304."},
-        {id:"AR-23", n:"Aretes C Flor Blanca", p:2000, c:"Aretes", d:"Aretes en C de flor blanca de acero inoxidable 201 y acero inoxidable 304, con recubrimiento de iones (IP) chapados en oro de 18k. Resistente al agua y al deslustre."},
-        {id:"AR-24", n:"Aretes Argolla Corazón", p:2000, c:"Aretes", d:"Aretes de argolla con colgante de corazón de acero inoxidable 304 con recubrimiento PVD chapado en oro auténtico. Resistente al agua y al deslustre."},
-        {id:"AR-25", n:"Aretes C Flor Negra", p:2200, c:"Aretes", d:"Aretes en C de flor negra de acero inoxidable 201 y acero inoxidable 304, con recubrimiento de iones (IP) chapados en oro de 18k. Resistente al agua y al deslustre."},
-        {id:"AR-26", n:"Aretes Flor Negra", p:2000, c:"Aretes", d:"Aretes de flor negra de acero inoxidable 201 y acero inoxidable 304, con recubrimiento de iones (IP) chapados en oro de 18k. Resistente al agua y al deslustre."},
-        {id:"AR-27", n:"Aretes Peach", p:2000, c:"Aretes", d:"Aretes peach de Acero inoxidable 304."},
-        {id:"AR-28", n:"Aretes Nido", p:2300, c:"Aretes", d:"Aretes de acero inoxidable, en forma de nido con perla. Grandes."},
-        {id:"AR-29", n:"Aretes Redondos", p:2300, c:"Aretes", d:"Aretes de acero inoxidable, en forma redonda con perla. Grandes."},
-        {id:"AR-30", n:"Aretes Abanico", p:2000, c:"Aretes", d:"Aretes de acero inoxidable, en forma de abanico con perla. Pequeños."},
-        {id:"AR-31", n:"Aretes Mármol Blanco", p:2500, c:"Aretes", d:"Aretes redondos de resina chapados en oro de 18K y acero inoxidable 304 con electrochapado al vacío (en horno) con incrustado blanco marmoleado."},
-        {id:"AR-32", n:"Aretes Mármol Café", p:2500, c:"Aretes", d:"Aretes redondos de resina chapados en oro de 18K y acero inoxidable 304 con electrochapado al vacío (en horno) con incrustado café marmoleado."},
-        {id:"AR-33", n:"Aretes Espiral", p:2000, c:"Aretes", d:"Aretes de acero inoxidable, en forma de espiral con perla. Pequeños."},
-        {id:"AR-34", n:"Aretes Mármol Verde", p:2500, c:"Aretes", d:"Aretes redondos de resina chapados en oro de 18K y acero inoxidable 304 con electrochapado al vacío (en horno) con incrustado verde marmoleado."},
-        {id:"AR-35", n:"Aretes Tulipán", p:1500, c:"Aretes", d:"Aretes en forma de Tulipán, enchapado acero titanio y chapados en oro de 18k. Recubrimiento PVD."},
-        {id:"AR-38", n:"Aretes Ostra", p:2300, c:"Aretes", d:"Aretes de acero inoxidable, en forma de ostra con perla. Grandes."},
-        {id:"AR-39", n:"Aretes Fresa", p:2000, c:"Aretes", d:"Aretes fresa de acero inoxidable 304."},
-        {id:"AR-40", n:"Aretes Argolla Perla", p:2000, c:"Aretes", d:"Aretes de argolla con colgante de perla de acero inoxidable con recubrimiento PVD chapado en oro auténtico. Resistente al agua y al deslustre."},
-        {id:"AR-41", n:"Aretes C Peq", p:2500, c:"Aretes", d:"Aretes en aro en forma de C de Acero inoxidable 304 con recubrimiento de iones (IP), chapados en oro de 18k. Resistente al agua y al deslustre. Pequeños."},
-        {id:"AR-42", n:"Aretes Flor 5 Pétalos", p:2000, c:"Aretes", d:"Aretes de acero inoxidable, en forma de flor de cinco pétalos con perla. Pequeños."},
-        {id:"AR-43", n:"Aretes Mármol Celeste", p:2500, c:"Aretes", d:"Aretes redondos de resina chapados en oro de 18K y acero inoxidable 304 con electrochapado al vacío (en horno) con incrustado celeste marmoleado."},
-        {id:"AR-44", n:"Aretes Margarita", p:1500, c:"Aretes", d:"Aretes Margarita de acero inoxidable 304 con recubrimiento PVD chapado en oro auténtico. Resistente al agua y al deslustre."},
-        {id:"AR-45", n:"Aretes Corazón Ondulado", p:2200, c:"Aretes", d:"Aretes corazón ondulado de acero inoxidable 304."},
-        {id:"AR-46", n:"Aretes Rosario Peq", p:2000, c:"Aretes", d:"Aretes Rosario de acero inoxidable 304, con recubrimiento de iones (IP) chapados en oro de 18k, resistente al agua y al deslustre. Pequeños."},
-        {id:"AR-47", n:"Aretes Corazón Gde", p:2500, c:"Aretes", d:"Aretes corazón ondulado de acero inoxidable 304. Grandes."},
-        {id:"AR-48", n:"Aretes Bolita Chunky", p:4000, c:"Aretes", d:"Aretes de bolita chunky de Acero inoxidable 304."},
-        {id:"AR-49", n:"Aretes Flor", p:2200, c:"Aretes", d:"Aretes flor de acero inoxidable 304."},
-        {id:"AR-50", n:"Aretes Geo Hueco", p:2500, c:"Aretes", d:"Aretes de acero inoxidable 316 y oro de 18k, estilo geométrico hueco de textura cuadrada, con capa de retención de color electrochapada."},
-        {id:"AR-52", n:"Aretes Hoja", p:2000, c:"Aretes", d:"Aretes hoja de acero inoxidable 304."},
-        {id:"AR-53", n:"Aretes Bloom", p:2500, c:"Aretes", d:"Aretes bloom de acero inoxidable 304."},
-        {id:"AR-54", n:"Aretes Maxi Verde", p:3500, c:"Aretes", d:"Aretes maximalistas de acero inoxidable 304, con recubrimiento de iones (IP), chapado en oro auténtico de 18k. Resistente al agua y al deslustre. Verde."},
-        {id:"AR-55", n:"Aretes Maxi Café", p:3500, c:"Aretes", d:"Aretes maximalistas de acero inoxidable 304, con recubrimiento de iones (IP), chapado en oro auténtico de 18k. Resistente al agua y al deslustre. Café."},
-        {id:"AR-56", n:"Aretes Maxi Beige", p:3500, c:"Aretes", d:"Aretes maximalistas de acero inoxidable 304, con recubrimiento de iones (IP), chapado en oro auténtico de 18k. Resistente al agua y al deslustre. Beige."},
-        {id:"AR-57", n:"Aretes Roca", p:2200, c:"Aretes", d:"Aretes roca de acero inoxidable 304."},
-        {id:"AR-58", n:"Aretes Margarita Peq", p:2000, c:"Aretes", d:"Aretes margarita de acero inoxidable 201 y acero inoxidable 304 con recubrimiento de iones (IP) chapados en oro de 18k. Resistente al agua y al deslustre. Pequeños."},
-        {id:"AR-59", n:"Aretes C Love", p:2200, c:"Aretes", d:"Aretes C love de acero inoxidable 304."},
-        {id:"AR-60", n:"Aretes Gota", p:2000, c:"Aretes", d:"Aretes en forma de gota de acero inoxidable."},
-        {id:"AR-61", n:"Aretes Gota Oro 18k", p:2000, c:"Aretes", d:"Aretes en forma de gota de acero inoxidable con pintura de oro 18k."},
-        {id:"AR-62", n:"Aretes Corazón Oro", p:2000, c:"Aretes", d:"Aretes en forma de corazón de acero inoxidable con pintura de oro 18k."},
-        {id:"AR-63", n:"Aretes Florcita Blanca", p:2000, c:"Aretes", d:"Aretes florcita blanca de acero inoxidable 201 y acero inoxidable 304 con recubrimiento de iones (IP) chapados en oro de 18k. Resistente al agua y al deslustre."},
-        {id:"AR-64", n:"Aretes Aro C", p:2000, c:"Aretes", d:"Aretes de aro en forma de C de acero inoxidable 304 con recubrimiento de iones (IP). Resistente al agua y al deslustre."},
-        {id:"AR-65", n:"Aretes Corazón Bañado", p:1500, c:"Aretes", d:"Aretes en forma de corazón de acero inoxidable 304, chapado de larga duración, bañado en oro."},
-        {id:"AR-66", n:"Aretes Florcita C", p:2000, c:"Aretes", d:"Aretes florcita en C de acero inoxidable 201 y acero inoxidable 304 con recubrimiento de iones (IP) chapados en oro de 18k. Resistente al agua y al deslustre."},
-        
+        // ARETES
+        {id:"AR-01", n:"Aretes Corazón 18k", p:2000, c:"Aretes", d:"Acero inoxidable con pintura de oro 18k."},
+        {id:"AR-02", n:"Aretes Corazón Diamante", p:3000, c:"Aretes", d:"Incrustaciones de zirconia, acero titanio."},
+        {id:"AR-03", n:"Aretes Caramelo", p:3000, c:"Aretes", d:"Minimalista vintage, geométricos, chapado oro."},
+        {id:"AR-04", n:"Aretes Caramelo Oscuro", p:3000, c:"Aretes", d:"Minimalista vintage, geométricos, chapado oro."},
+        {id:"AR-05", n:"Aretes Rosario", p:2500, c:"Aretes", d:"Acero 304, chapado oro 18k. Grandes."},
+        {id:"AR-06", n:"Aretes Lechuguilla Plata", p:2500, c:"Aretes", d:"Acero 316L, circón, hechos a mano. Plateados."},
+        {id:"AR-07", n:"Aretes Lechuguilla Oro", p:2750, c:"Aretes", d:"Acero 316L, circón, chapado oro 18k. Dorados."},
+        {id:"AR-08", n:"Aretes Flor Perla", p:2300, c:"Aretes", d:"Flor de cuatro pétalos con perla. Grandes."},
+        {id:"AR-09", n:"Aretes Lazo Perla Peq", p:2000, c:"Aretes", d:"Forma de lazo con perla. Pequeños."},
+        {id:"AR-10", n:"Aretes Palmera Perla", p:2300, c:"Aretes", d:"Forma de palmera con perla. Grandes."},
+        {id:"AR-11", n:"Aretes Asimétricos", p:2500, c:"Aretes", d:"Acero inoxidable y resina, estilo dorado."},
+        {id:"AR-12", n:"Aretes Asimétricos II", p:2500, c:"Aretes", d:"Acero inoxidable y resina, estilo dorado."},
+        {id:"AR-13", n:"Aretes Asimétricos III", p:2500, c:"Aretes", d:"Acero inoxidable y resina, estilo dorado."},
+        {id:"AR-14", n:"Aretes Pulpo Perla", p:2300, c:"Aretes", d:"Forma de pulpo con perlas ovaladas. Grandes."},
+        {id:"AR-15", n:"Aretes Óvalo Perla", p:2300, c:"Aretes", d:"Forma de óvalo con perlas ovaladas. Grandes."},
+        {id:"AR-16", n:"Aretes Platillo Perla", p:2300, c:"Aretes", d:"Forma de platillo con perlas ovaladas. Grandes."},
+        {id:"AR-17", n:"Aretes Lazo Perla Gde", p:2300, c:"Aretes", d:"Forma de lazo con perla. Grandes."},
+        {id:"AR-18", n:"Aretes Gota PVD", p:2000, c:"Aretes", d:"Acero 304 PVD chapado oro auténtico."},
+        {id:"AR-19", n:"Aretes Corazón Perla", p:2300, c:"Aretes", d:"Forma de corazón con perla. Grandes."},
+        {id:"AR-20", n:"Aretes Aro C 18k", p:2500, c:"Aretes", d:"Acero 304 IP, chapado oro 18k. Grandes."},
+        {id:"AR-21", n:"Aretes Lazo Colgante", p:2000, c:"Aretes", d:"Acero 304 PVD oro auténtico con perla."},
+        {id:"AR-22", n:"Aretes Púa", p:2300, c:"Aretes", d:"Diseño de púa, acero inoxidable 304."},
+        {id:"AR-23", n:"Aretes C Flor Blanca", p:2000, c:"Aretes", d:"Acero 304, recubrimiento IP oro 18k."},
+        {id:"AR-24", n:"Aretes Argolla Corazón", p:2000, c:"Aretes", d:"Acero 304 PVD chapado oro auténtico."},
+        {id:"AR-25", n:"Aretes C Flor Negra", p:2200, c:"Aretes", d:"Acero 304, recubrimiento IP oro 18k."},
+        {id:"AR-26", n:"Aretes Flor Negra", p:2000, c:"Aretes", d:"Acero 304, recubrimiento IP oro 18k."},
+        {id:"AR-27", n:"Aretes Peach", p:2000, c:"Aretes", d:"Diseño peach, acero inoxidable 304."},
+        {id:"AR-28", n:"Aretes Nido Perla", p:2300, c:"Aretes", d:"Forma de nido con perla. Grandes."},
+        {id:"AR-29", n:"Aretes Redondos Perla", p:2300, c:"Aretes", d:"Forma redonda con perla. Grandes."},
+        {id:"AR-30", n:"Aretes Abanico Perla", p:2000, c:"Aretes", d:"Forma de abanico con perla. Pequeños."},
+        {id:"AR-31", n:"Aretes Mármol Blanco", p:2500, c:"Aretes", d:"Resina chapada oro 18k, incrustado mármol."},
+        {id:"AR-32", n:"Aretes Mármol Café", p:2500, c:"Aretes", d:"Resina chapada oro 18k, incrustado mármol."},
+        {id:"AR-33", n:"Aretes Espiral Perla", p:2000, c:"Aretes", d:"Forma de espiral con perla. Pequeños."},
+        {id:"AR-34", n:"Aretes Mármol Verde", p:2500, c:"Aretes", d:"Resina chapada oro 18k, incrustado mármol."},
+        {id:"AR-35", n:"Aretes Tulipán PVD", p:1500, c:"Aretes", d:"Enchapado acero titanio, oro 18k."},
+        {id:"AR-36", n:"Aretes Tulipán PVD II", p:1500, c:"Aretes", d:"Enchapado acero titanio, oro 18k."},
+        {id:"AR-37", n:"Aretes Tulipán PVD III", p:1500, c:"Aretes", d:"Enchapado acero titanio, oro 18k."},
+        {id:"AR-38", n:"Aretes Ostra Grande", p:2300, c:"Aretes", d:"Forma de ostra con perla. Grandes."},
+        {id:"AR-39", n:"Aretes Fresa", p:2000, c:"Aretes", d:"Diseño de fresa, acero inoxidable 304."},
+        {id:"AR-40", n:"Aretes Argolla Perla", p:2000, c:"Aretes", d:"Colgante de perla, PVD chapado oro."},
+        {id:"AR-41", n:"Aretes C Pequeños", p:2500, c:"Aretes", d:"Acero 304 IP, chapados oro 18k. Pequeños."},
+        {id:"AR-42", n:"Aretes Flor 5 Pétalos", p:2000, c:"Aretes", d:"Flor de cinco pétalos con perla. Pequeños."},
+        {id:"AR-43", n:"Aretes Mármol Celeste", p:2500, c:"Aretes", d:"Resina chapada oro 18k, incrustado mármol."},
+        {id:"AR-44", n:"Aretes Margarita", p:1500, c:"Aretes", d:"Acero 304 PVD chapado oro auténtico."},
+        {id:"AR-45", n:"Aretes Corazón Ondulado", p:2200, c:"Aretes", d:"Acero inoxidable 304."},
+        {id:"AR-46", n:"Aretes Rosario Peq", p:2000, c:"Aretes", d:"Acero 304 IP chapados oro 18k. Pequeños."},
+        {id:"AR-47", n:"Aretes Corazón Grande", p:2500, c:"Aretes", d:"Corazón ondulado acero 304. Grandes."},
+        {id:"AR-48", n:"Aretes Bolita Chunky", p:4000, c:"Aretes", d:"Bolita chunky de acero inoxidable 304."},
+        {id:"AR-49", n:"Aretes Flor", p:2200, c:"Aretes", d:"Diseño flor, acero inoxidable 304."},
+        {id:"AR-50", n:"Aretes Geo Hueco", p:2500, c:"Aretes", d:"Acero 316 oro 18k, textura cuadrada."},
+        {id:"AR-51", n:"Aretes Geo Hueco II", p:2200, c:"Aretes", d:"Acero 316 oro 18k, textura cuadrada."},
+        {id:"AR-52", n:"Aretes Hoja", p:2000, c:"Aretes", d:"Diseño de hoja, acero inoxidable 304."},
+        {id:"AR-53", n:"Aretes Bloom", p:2500, c:"Aretes", d:"Diseño bloom, acero inoxidable 304."},
+        {id:"AR-54", n:"Aretes Maxi Verde", p:3500, c:"Aretes", d:"Maximalistas acero 304 IP oro 18k. Verde."},
+        {id:"AR-55", n:"Aretes Maxi Café", p:3500, c:"Aretes", d:"Maximalistas acero 304 IP oro 18k. Café."},
+        {id:"AR-56", n:"Aretes Maxi Beige", p:3500, c:"Aretes", d:"Maximalistas acero 304 IP oro 18k. Beige."},
+        {id:"AR-57", n:"Aretes Roca", p:2200, c:"Aretes", d:"Diseño roca, acero inoxidable 304."},
+        {id:"AR-58", n:"Aretes Margarita Peq", p:2000, c:"Aretes", d:"Acero 304 IP oro 18k. Pequeños."},
+        {id:"AR-59", n:"Aretes C Love", p:2200, c:"Aretes", d:"Diseño C Love, acero inoxidable 304."},
+        {id:"AR-60", n:"Aretes Gota", p:2000, c:"Aretes", d:"Forma de gota, acero inoxidable."},
+        {id:"AR-61", n:"Aretes Gota Oro", p:2000, c:"Aretes", d:"Forma de gota, pintura oro 18k."},
+        {id:"AR-62", n:"Aretes Corazón Oro", p:2000, c:"Aretes", d:"Forma de corazón, pintura oro 18k."},
+        {id:"AR-63", n:"Aretes Flor Blanca", p:2000, c:"Aretes", d:"Florcita blanca, acero 304 IP oro 18k."},
+        {id:"AR-64", n:"Aretes Aro C", p:2000, c:"Aretes", d:"Forma de C, acero 304 IP."},
+        {id:"AR-65", n:"Aretes Corazón Bañado", p:1500, c:"Aretes", d:"Acero 304, chapado larga duración."},
+        {id:"AR-66", n:"Aretes Florcita C", p:2000, c:"Aretes", d:"Florcita en C, acero 304 IP oro 18k."},
+
         // EAR CUFFS
-        {id:"EA-01", n:"Ear Cuff 304", p:1500, c:"Aretes", d:"Ear cuff enchapado de Acero inoxidable 304."},
-        {id:"EA-02", n:"Ear Cuff 304 II", p:1500, c:"Aretes", d:"Ear cuff enchapado de Acero inoxidable 304."},
-        {id:"EA-03", n:"Ear Cuff 304 III", p:1500, c:"Aretes", d:"Ear cuff enchapado de Acero inoxidable 304."},
-        {id:"EA-06", n:"Ear Cuff Chunky Oro", p:2000, c:"Aretes", d:"Ear cuff chuncky de acero inoxidable con recubrimiento PVD, chapados en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"EA-07", n:"Ear Cuff Chunky Oro II", p:2000, c:"Aretes", d:"Ear cuff chuncky de acero inoxidable con recubrimiento PVD, chapados en oro auténtico de 18k. Resistente al agua y al deslustre."},
+        {id:"EA-01", n:"Ear Cuff 304", p:1500, c:"Aretes", d:"Enchapado acero inoxidable 304."},
+        {id:"EA-02", n:"Ear Cuff 304 II", p:1500, c:"Aretes", d:"Enchapado acero inoxidable 304."},
+        {id:"EA-03", n:"Ear Cuff 304 III", p:1500, c:"Aretes", d:"Enchapado acero inoxidable 304."},
+        {id:"EA-04", n:"Ear Cuff 304 IV", p:1500, c:"Aretes", d:"Enchapado acero inoxidable 304."},
+        {id:"EA-05", n:"Ear Cuff 304 V", p:1500, c:"Aretes", d:"Enchapado acero inoxidable 304."},
+        {id:"EA-06", n:"Ear Cuff Chunky Oro", p:2000, c:"Aretes", d:"PVD chapado oro 18k. Chunky."},
+        {id:"EA-07", n:"Ear Cuff Chunky II", p:2000, c:"Aretes", d:"PVD chapado oro 18k. Chunky."},
 
-        [cite_start]// COLLARES [cite: 97-116]
-        {id:"CA-01", n:"Collar 3 Capas", p:3000, c:"Collares", d:"Collar de 3 capas, color sólido de acero inoxidable 304 resistente al agua y al deslustre, con recubrimiento PVD chapado en oro auténtico oro de 18 quilates."},
-        {id:"CA-02", n:"Collar 2 Capas", p:3500, c:"Collares", d:"Collar de 2 capas de cadena de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"CA-03", n:"Collar 2 Capas II", p:3000, c:"Collares", d:"Collar de 2 capas de cadena de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"CA-04", n:"Collar 2 Capas III", p:3500, c:"Collares", d:"Collar de 2 capas de cadena de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"CA-05", n:"Collar Tulipán Oro", p:2000, c:"Collares", d:"Collar con dije de tulipán de acero inoxidable 304, con recubrimiento PVD chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"CA-09", n:"Collar Corazón Zirconia", p:3500, c:"Collares", d:"Collar con incrustaciones de diamantes en forma de corazón, accesorios de acero de titanio zirconia."},
-        {id:"CA-10", n:"Collar Capas 18k", p:3500, c:"Collares", d:"Collar en capas de acero inoxidable 304 con recubrimiento PVD chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"CA-11", n:"Collar Capas PVD", p:2500, c:"Collares", d:"Collar en capas de acero inoxidable 304 con recubrimiento PVD. Resistente al agua y al deslustre."},
-        {id:"CA-12", n:"Cadena Rombos", p:3000, c:"Collares", d:"Cadena de rombos doble capa de acero inoxidable 316, electrochapado chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"CA-13", n:"Cadena Corazón 18k", p:3500, c:"Collares", d:"Cadena de doble capa con colgante de corazón de acero inoxidable 316 chapado en oro de 18K, electrochapado al vacío (en horno)."},
-        {id:"CA-14", n:"Cadena Geométrica", p:2500, c:"Collares", d:"Cadena de patrón geométrico de acero inoxidable 201 con recubrimiento al vacío (en horno), chapado en oro real de 18k."},
-        {id:"CA-15", n:"Collar Doble 18k", p:3000, c:"Collares", d:"Collar doble de acero inoxidable 304 con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al y al deslustre."},
-        {id:"CA-16", n:"Collar Doble 18k II", p:3200, c:"Collares", d:"Collar doble de acero inoxidable 304 con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al y al deslustre."},
-        {id:"CA-17", n:"Collar Perla Oro", p:3000, c:"Collares", d:"Collar de acero inoxidable 304, chapado en oro, con perla."},
-        {id:"CA-18", n:"Collar Doble 18k III", p:3000, c:"Collares", d:"Collar doble de acero inoxidable 304 con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
+        // COLLARES
+        {id:"CA-01", n:"Collar 3 Capas Oro", p:3000, c:"Collares", d:"3 capas, acero 304 PVD oro 18k."},
+        {id:"CA-02", n:"Collar 2 Capas", p:3500, c:"Collares", d:"2 capas, acero 304 PVD oro 18k."},
+        {id:"CA-03", n:"Collar 2 Capas II", p:3000, c:"Collares", d:"2 capas, acero 304 PVD oro 18k."},
+        {id:"CA-04", n:"Collar 2 Capas III", p:3500, c:"Collares", d:"2 capas, acero 304 PVD oro 18k."},
+        {id:"CA-05", n:"Collar Tulipán Oro", p:2000, c:"Collares", d:"Dije tulipán, acero 304 PVD oro 18k."},
+        {id:"CA-06", n:"Collar Tulipán II", p:2000, c:"Collares", d:"Dije tulipán, acero 304 PVD oro 18k."},
+        {id:"CA-07", n:"Collar Tulipán III", p:2000, c:"Collares", d:"Dije tulipán, acero 304 PVD oro 18k."},
+        {id:"CA-08", n:"Collar Tulipán IV", p:2000, c:"Collares", d:"Dije tulipán, acero 304 PVD oro 18k."},
+        {id:"CA-09", n:"Collar Corazón Zirconia", p:3500, c:"Collares", d:"Incrustaciones diamantes, acero titanio."},
+        {id:"CA-10", n:"Collar Capas 18k", p:3500, c:"Collares", d:"Capas acero 304 PVD oro 18k."},
+        {id:"CA-11", n:"Collar Capas PVD", p:2500, c:"Collares", d:"Capas acero 304 PVD."},
+        {id:"CA-12", n:"Cadena Rombos Doble", p:3000, c:"Collares", d:"Acero 316 electrochapado oro 18k."},
+        {id:"CA-13", n:"Cadena Corazón 18k", p:3500, c:"Collares", d:"Colgante corazón, acero 316 oro 18k."},
+        {id:"CA-14", n:"Cadena Geométrica", p:2500, c:"Collares", d:"Patrón geométrico acero 201 oro 18k."},
+        {id:"CA-15", n:"Collar Doble 18k", p:3000, c:"Collares", d:"Collar doble acero 304 PVD oro 18k."},
+        {id:"CA-16", n:"Collar Doble 18k II", p:3200, c:"Collares", d:"Collar doble acero 304 PVD oro 18k."},
+        {id:"CA-17", n:"Collar Perla Oro", p:3000, c:"Collares", d:"Acero 304 chapado oro con perla."},
+        {id:"CA-18", n:"Collar Doble 18k III", p:3000, c:"Collares", d:"Collar doble acero 304 PVD oro 18k."},
 
-        [cite_start]// PULSERAS Y TOBILLERAS [cite: 117-143]
-        {id:"BR-01", n:"Brazalete PVD Oro", p:2500, c:"Pulseras", d:"Brazalete de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico. Resistente al agua y al deslustre."},
-        {id:"BR-02", n:"Brazalete PVD Oro II", p:2500, c:"Pulseras", d:"Brazalete de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico. Resistente al agua y al deslustre."},
-        {id:"BR-03", n:"Brazalete PVD Oro III", p:2000, c:"Pulseras", d:"Brazalete de acero inoxidable 304, con recubrimiento PVD, chapado en oro auténtico. Resistente al agua y al deslustre."},
-        {id:"PU-01", n:"Pulsera Acero 304", p:2500, c:"Pulseras", d:"Pulsera de acero inoxidable 304. Resistente al agua y al deslustre."},
-        {id:"PU-06", n:"Pulsera Simple", p:2000, c:"Pulseras", d:"Pulsera de acero inoxidable 304. Resistente al agua y al deslustre."},
-        {id:"PU-10", n:"Pulsera Titanio Oro", p:3000, c:"Pulseras", d:"Pulsera de acero inoxidable 304 y acero de titanio con recubrimiento PVD chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"PU-11", n:"Pulsera IP 304", p:2500, c:"Pulseras", d:"Pulsera de acero inoxidable 304 con recubrimiento de iones (IP). Resistente al agua y al deslustre."},
-        {id:"PU-14", n:"Pulsera IP 304 II", p:3000, c:"Pulseras", d:"Pulsera de acero inoxidable 304 con recubrimiento de iones (IP). Resistente al agua y al deslustre."},
-        {id:"PU-15", n:"Pulsera PVD 18k", p:3000, c:"Pulseras", d:"Pulsera de acero inoxidable 304 con recubrimiento PVD, chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"PU-16", n:"Pulsera PVD 304", p:2500, c:"Pulseras", d:"Pulsera de acero inoxidable 304 con recubrimiento PVD. Resistente al agua y al deslustre."},
-        {id:"PU-18", n:"Pulsera Geométrica", p:2000, c:"Pulseras", d:"Pulsera de patrón geométrico de acero inoxidable 201 con recubrimiento al vacío (en horno), chapado en oro real de 18k."},
-        {id:"PU-24", n:"Pulsera Corazón 16k", p:2500, c:"Pulseras", d:"Pulsera con corazón de acero inoxidable 304 con recubrimiento PVD, chapado en oro auténtico de 16k. Resistente al agua y deslustre."},
-        {id:"TO-01", n:"Tobillera PVD 18k", p:2000, c:"Tobilleras", d:"Tobillera de acero inoxidable 304 con recubrimiento PVD chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"TO-02", n:"Tobillera Acero", p:2000, c:"Tobilleras", d:"Tobillera de acero inoxidable."},
-        {id:"TO-03", n:"Tobillera PVD 18k II", p:2000, c:"Tobilleras", d:"Tobillera de acero inoxidable 304 con recubrimiento PVD chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"TO-04", n:"Tobillera PVD 18k III", p:2000, c:"Tobilleras", d:"Tobillera de acero inoxidable 304 con recubrimiento PVD chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"TO-05", n:"Tobillera Corazón", p:2500, c:"Tobilleras", d:"Tobillera doble con corazón de acero inoxidable."},
-        {id:"TO-06", n:"Tobillera Corazón II", p:2200, c:"Tobilleras", d:"Tobillera doble con corazón de acero inoxidable."},
+        // PULSERAS
+        {id:"BR-01", n:"Brazalete PVD Oro", p:2500, c:"Pulseras", d:"Acero 304 PVD chapado oro auténtico."},
+        {id:"BR-02", n:"Brazalete PVD Oro II", p:2500, c:"Pulseras", d:"Acero 304 PVD chapado oro auténtico."},
+        {id:"BR-03", n:"Brazalete PVD Oro III", p:2000, c:"Pulseras", d:"Acero 304 PVD chapado oro auténtico."},
+        {id:"PU-01", n:"Pulsera Acero 304", p:2500, c:"Pulseras", d:"Resistente al agua y deslustre."},
+        {id:"PU-02", n:"Pulsera Acero 304 II", p:2500, c:"Pulseras", d:"Resistente al agua y deslustre."},
+        {id:"PU-03", n:"Pulsera Acero 304 III", p:2500, c:"Pulseras", d:"Resistente al agua y deslustre."},
+        {id:"PU-04", n:"Pulsera Acero 304 IV", p:2500, c:"Pulseras", d:"Resistente al agua y deslustre."},
+        {id:"PU-05", n:"Pulsera Acero 304 V", p:2500, c:"Pulseras", d:"Resistente al agua y deslustre."},
+        {id:"PU-06", n:"Pulsera Simple", p:2000, c:"Pulseras", d:"Acero inoxidable 304."},
+        {id:"PU-07", n:"Pulsera Simple II", p:2000, c:"Pulseras", d:"Acero inoxidable 304."},
+        {id:"PU-08", n:"Pulsera Simple III", p:2500, c:"Pulseras", d:"Acero inoxidable 304."},
+        {id:"PU-09", n:"Pulsera Simple IV", p:2000, c:"Pulseras", d:"Acero inoxidable 304."},
+        {id:"PU-10", n:"Pulsera Titanio Oro", p:3000, c:"Pulseras", d:"Acero titanio PVD oro 18k."},
+        {id:"PU-11", n:"Pulsera IP 304", p:2500, c:"Pulseras", d:"Recubrimiento IP, resistente al agua."},
+        {id:"PU-12", n:"Pulsera IP 304 II", p:2500, c:"Pulseras", d:"Recubrimiento IP, resistente al agua."},
+        {id:"PU-13", n:"Pulsera IP 304 III", p:2500, c:"Pulseras", d:"Recubrimiento IP, resistente al agua."},
+        {id:"PU-14", n:"Pulsera IP 304 IV", p:3000, c:"Pulseras", d:"Recubrimiento IP, resistente al agua."},
+        {id:"PU-15", n:"Pulsera PVD 18k", p:3000, c:"Pulseras", d:"Acero 304 PVD chapado oro 18k."},
+        {id:"PU-16", n:"Pulsera PVD 304", p:2500, c:"Pulseras", d:"Acero 304 PVD."},
+        {id:"PU-18", n:"Pulsera Geométrica", p:2000, c:"Pulseras", d:"Patrón geométrico acero 201 oro 18k."},
+        {id:"PU-19", n:"Pulsera 304 VI", p:2500, c:"Pulseras", d:"Acero inoxidable 304."},
+        {id:"PU-20", n:"Pulsera 304 VII", p:2000, c:"Pulseras", d:"Acero inoxidable 304."},
+        {id:"PU-21", n:"Pulsera 304 VIII", p:2500, c:"Pulseras", d:"Acero inoxidable 304."},
+        {id:"PU-22", n:"Pulsera 304 IX", p:2000, c:"Pulseras", d:"Acero inoxidable 304."},
+        {id:"PU-23", n:"Pulsera 304 X", p:2000, c:"Pulseras", d:"Acero inoxidable 304."},
+        {id:"PU-24", n:"Pulsera Corazón 16k", p:2500, c:"Pulseras", d:"Corazón acero 304 PVD oro 16k."},
 
-        [cite_start]// SETS / CONJUNTOS [cite: 144-152]
-        {id:"ARJ-01", n:"Set 3 Pares Flores", p:3000, c:"Sets", d:"Juego de tres pares de aretes de acero inoxidable 304 con diseño de flor, chapado en oro de 18k."},
-        {id:"ARJ-02", n:"Set 3 Pares Geo", p:3000, c:"Sets", d:"Juego de tres pares de aretes de acero inoxidable 304 con diseño de rectángulo, aro y bolita, chapado en oro de 18k."},
-        {id:"ARJ-03", n:"Set 3 Pares Corazón", p:3000, c:"Sets", d:"Juego de tres pares de aretes de acero inoxidable 304 con diseño de corazón, aro y bolita, chapado en oro de 18k."},
-        {id:"CO-01", n:"Set Perla Gota", p:3500, c:"Sets", d:"Elegante set de 3 piezas (aretes y cadena) de acero inoxidable impermeable y que no se desvanece, con dije de perla en forma de gota de agua en oro/plata."},
-        {id:"CO-02", n:"Set Resina 18k", p:4500, c:"Sets", d:"Set de 3 piezas (cadena y aretes) de acero inoxidable 304 con recubrimiento de iones (IP) y resina, chapados en oro de 18k. Resistente al agua y al deslustre."},
-        {id:"CO-03", n:"Set Resina 18k II", p:4500, c:"Sets", d:"Set de 3 piezas (cadena y aretes) de acero inoxidable 304 con recubrimiento de iones (IP) y resina, chapados en oro de 18k. Resistente al agua y al deslustre."},
-        {id:"CO-04", n:"Set Cadena Pulsera", p:5000, c:"Sets", d:"Set de 2 piezas (cadena y pulsera) de acero inoxidable 316. Electrochapado chapado en oro auténtico de 18k. Resistente al agua y al deslustre."},
-        {id:"CO-05", n:"Set Corazón Doble", p:4500, c:"Sets", d:"Conjunto de collar y pulsera de acero inoxidable chapado en oro de 18K con colgante de corazón de doble capa."},
-        {id:"CO-06", n:"Set Corazón Doble II", p:4200, c:"Sets", d:"Conjunto de collar y pulsera de acero inoxidable chapado en oro de 18K con colgante de corazón de doble capa."},
-        {id:"CO-07", n:"Set Flor Negra", p:2500, c:"Sets", d:"Set de 3 piezas (collar y aretes) de acero inoxidable 304, flor negra de seis pétalos con gota de aceite de chapado en oro, imitación electrochapado pulido."},
-        {id:"CO-08", n:"Set Flor Blanca", p:2500, c:"Sets", d:"Set de 3 piezas (collar y aretes) de acero inoxidable 304, flor blanca de seis pétalos con gota de aceite de chapado en oro, imitación electrochapado pulido."}
+        // TOBILLERAS (Categoría Pulseras)
+        {id:"TO-01", n:"Tobillera PVD 18k", p:2000, c:"Tobilleras", d:"Acero 304 PVD chapado oro 18k."},
+        {id:"TO-02", n:"Tobillera Acero", p:2000, c:"Tobilleras", d:"Acero inoxidable."},
+        {id:"TO-03", n:"Tobillera PVD 18k II", p:2000, c:"Tobilleras", d:"Acero 304 PVD chapado oro 18k."},
+        {id:"TO-04", n:"Tobillera PVD 18k III", p:2000, c:"Tobilleras", d:"Acero 304 PVD chapado oro 18k."},
+        {id:"TO-05", n:"Tobillera Corazón", p:2500, c:"Tobilleras", d:"Tobillera doble con corazón."},
+        {id:"TO-06", n:"Tobillera Corazón II", p:2200, c:"Tobilleras", d:"Tobillera doble con corazón."},
+
+        // SETS
+        {id:"ARJ-01", n:"Set 3 Pares Flores", p:3000, c:"Sets", d:"3 pares diseño flor, chapado oro 18k."},
+        {id:"ARJ-02", n:"Set 3 Pares Geo", p:3000, c:"Sets", d:"Rectángulo, aro y bolita, oro 18k."},
+        {id:"ARJ-03", n:"Set 3 Pares Corazón", p:3000, c:"Sets", d:"Corazón, aro y bolita, oro 18k."},
+        {id:"CO-01", n:"Set Perla Gota", p:3500, c:"Sets", d:"3 piezas (aretes y cadena) dije perla."},
+        {id:"CO-02", n:"Set Resina 18k", p:4500, c:"Sets", d:"3 piezas, acero 304 IP resina oro 18k."},
+        {id:"CO-03", n:"Set Resina 18k II", p:4500, c:"Sets", d:"3 piezas, acero 304 IP resina oro 18k."},
+        {id:"CO-04", n:"Set Cadena Pulsera", p:5000, c:"Sets", d:"2 piezas acero 316 oro 18k."},
+        {id:"CO-05", n:"Set Corazón Doble", p:4500, c:"Sets", d:"Collar y pulsera chapado oro 18k."},
+        {id:"CO-06", n:"Set Corazón Doble II", p:4200, c:"Sets", d:"Collar y pulsera chapado oro 18k."},
+        {id:"CO-07", n:"Set Flor Negra", p:2500, c:"Sets", d:"3 piezas flor negra gota de aceite."},
+        {id:"CO-08", n:"Set Flor Blanca", p:2500, c:"Sets", d:"3 piezas flor blanca gota de aceite."}
     ];
 
     let cart = [];
 
-    // Carga de productos
-    function render(category = 'all') {
+    // Cargar productos
+    function loadProducts(category = 'all') {
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
         
         const filtered = category === 'all' 
             ? products 
-            : products.filter(p => (category === 'Tobilleras' ? p.c === 'Tobilleras' : (category === 'Pulseras' ? (p.c === 'Pulseras' || p.c === 'Tobilleras') : p.c === category)));
+            : products.filter(p => p.c === category);
 
         filtered.forEach(p => {
             const card = document.createElement('div');
             card.className = 'card';
-            // Busca imagen en carpeta img/ID.jpg
+            
+            // Lógica de Imagen: Intenta cargar img/ID.jpg, si falla muestra placeholder
             const imgPath = `img/${p.id}.jpg`;
             
             card.innerHTML = `
-                <div class="img-wrapper">
-                    <img src="${imgPath}" class="card-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                    <div class="no-img" style="display:none">
-                        <span style="font-size:2rem; margin-bottom:5px">💎</span>
+                <div class="card-img-wrapper">
+                    <img src="${imgPath}" class="card-img" alt="${p.n}" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div class="no-img-placeholder" style="display:none">
+                        <span style="font-size:2rem; margin-bottom:10px">💎</span>
                         <span>${p.id}</span>
-                        <small style="font-size:0.7rem">Sin Foto</small>
+                        <small style="margin-top:5px; font-size:0.7rem">Sin foto</small>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="code">${p.id}</div>
-                    <h3 class="name">${p.n}</h3>
-                    <div class="desc">${p.d}</div>
-                    <div class="footer">
+                <div class="card-info">
+                    <span class="card-code">${p.id}</span>
+                    <h3 class="card-title">${p.n}</h3>
+                    <p class="card-desc">${p.d}</p>
+                    <div class="card-footer">
                         <span class="price">₡${p.p.toLocaleString()}</span>
-                        <button class="add-btn" onclick="add('${p.id}')">Agregar</button>
+                        <button class="add-btn" onclick="addToCart('${p.id}')">+</button>
                     </div>
                 </div>
             `;
             grid.appendChild(card);
         });
         
-        document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+        // Manejar estado activo de botones
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
         if(event) event.target.classList.add('active');
         else document.querySelector('.cat-btn').classList.add('active');
     }
 
-    function filter(cat) { render(cat); }
+    function filterProducts(cat) { loadProducts(cat); }
 
-    function add(id) {
-        const p = products.find(i => i.id === id);
-        cart.push(p);
-        updateCart();
-        alert(`¡${p.n} agregado!`);
-    }
-
-    function remove(index) {
-        cart.splice(index, 1);
-        updateCart();
-    }
-
-    function updateCart() {
-        document.getElementById('cart-badge').innerText = cart.length;
+    function addToCart(id) {
+        const product = products.find(p => p.id === id);
+        cart.push(product);
+        updateCartDisplay();
         
-        // Render List
+        // Efecto visual en botón flotante
+        const fab = document.querySelector('.fab-cart');
+        fab.style.transform = "scale(1.2)";
+        setTimeout(() => fab.style.transform = "scale(1)", 200);
+    }
+
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        updateCartDisplay();
+    }
+
+    function updateCartDisplay() {
+        // Actualizar contador
+        document.getElementById('cart-total-badge').innerText = cart.length;
+        
+        // Calcular total
+        const total = cart.reduce((sum, item) => sum + item.p, 0);
+        document.getElementById('cart-final-total').innerText = total.toLocaleString();
+        
+        // Renderizar lista
         const list = document.getElementById('cart-list');
-        if(cart.length === 0) list.innerHTML = '<p style="text-align:center;color:#999;padding:20px">Tu carrito está vacío</p>';
-        else {
-            list.innerHTML = cart.map((item, i) => `
+        if(cart.length === 0) {
+            list.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">El carrito está vacío.</p>';
+        } else {
+            list.innerHTML = cart.map((item, index) => `
                 <div class="cart-item">
-                    <div>
-                        <strong>${item.n}</strong><br>
+                    <div class="cart-item-info">
+                        <strong>${item.n}</strong>
                         <small>${item.id}</small>
                     </div>
                     <div style="text-align:right">
                         <div>₡${item.p.toLocaleString()}</div>
-                        <small style="color:red;cursor:pointer" onclick="remove(${i})">Eliminar</small>
+                        <span class="remove-link" onclick="removeFromCart(${index})">Eliminar</span>
                     </div>
                 </div>
             `).join('');
         }
-
-        // Cálculos de Descuento
-        const subtotal = cart.reduce((sum, i) => sum + i.p, 0);
-        let discount = 0;
-        const count = cart.length;
-        
-        const promoMsg = document.getElementById('promo-msg');
-        const discountRow = document.getElementById('discount-row');
-
-        if(count >= CONFIG.discountThreshold) {
-            discount = subtotal * CONFIG.discountRate;
-            promoMsg.classList.add('promo-success');
-            promoMsg.innerHTML = `¡Felicidades! Tienes un <b>20% de descuento</b> aplicado.`;
-            discountRow.style.display = 'flex';
-        } else {
-            promoMsg.classList.remove('promo-success');
-            const missing = CONFIG.discountThreshold - count;
-            promoMsg.innerHTML = `¡Agrega <b>${missing}</b> producto(s) más para obtener <b>20% de descuento</b>!`;
-            discountRow.style.display = 'none';
-        }
-
-        const total = subtotal - discount;
-
-        document.getElementById('subtotal').innerText = subtotal.toLocaleString();
-        document.getElementById('discount-val').innerText = discount.toLocaleString();
-        document.getElementById('final-total').innerText = total.toLocaleString();
     }
 
     function toggleCart() {
-        const modal = document.getElementById('modal');
+        const modal = document.getElementById('cart-modal');
         modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        updateCart();
     }
 
     function checkout(method) {
-        if(cart.length === 0) return alert("El carrito está vacío");
+        if(cart.length === 0) return alert("Tu carrito está vacío.");
         
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const address = document.getElementById('address').value;
-        
-        if(!name) return alert("Por favor escribe tu nombre");
+        const name = document.getElementById('client-name').value;
+        const phone = document.getElementById('client-phone').value;
+        const address = document.getElementById('client-address').value;
 
-        // Recalcular para el mensaje
-        const subtotal = cart.reduce((sum, i) => sum + i.p, 0);
-        let discount = 0;
-        if(cart.length >= CONFIG.discountThreshold) discount = subtotal * CONFIG.discountRate;
-        const total = subtotal - discount;
+        if(!name) return alert("Por favor ingresa tu nombre.");
 
         let msg = `Hola KAFLOCA STORE, soy ${name}. Deseo ordenar lo siguiente:\n\n`;
-        cart.forEach(i => msg += `▪ ${i.n} (${i.id}): ₡${i.p.toLocaleString()}\n`);
+        let total = 0;
         
-        msg += `\n----------------\n`;
-        msg += `Subtotal: ₡${subtotal.toLocaleString()}\n`;
-        if(discount > 0) msg += `Descuento (20%): -₡${discount.toLocaleString()}\n`;
-        msg += `*TOTAL A PAGAR: ₡${total.toLocaleString()}*\n`;
+        cart.forEach(item => {
+            msg += `▪ ${item.n} (${item.id}): ₡${item.p.toLocaleString()}\n`;
+            total += item.p;
+        });
         
-        if(phone) msg += `Teléfono: ${phone}\n`;
-        if(address) msg += `Dirección: ${address}`;
+        msg += `\n*TOTAL: ₡${total.toLocaleString()}*`;
+        if(phone) msg += `\nTeléfono: ${phone}`;
+        if(address) msg += `\nDirección: ${address}`;
 
-        if(method === 'whatsapp') window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`);
-        else window.location.href = `mailto:${CONFIG.email}?subject=Pedido ${name}&body=${encodeURIComponent(msg)}`;
+        if(method === 'whatsapp') {
+            window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+        } else {
+            window.location.href = `mailto:${STORE_EMAIL}?subject=Nuevo Pedido de ${name}&body=${encodeURIComponent(msg)}`;
+        }
     }
 
-    // Iniciar
-    render();
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProducts();
+        updateCartDisplay();
+    });
 </script>
 
 </body>
