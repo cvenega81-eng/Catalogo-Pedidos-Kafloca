@@ -1,188 +1,288 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo KAFLOCA STORE</title>
-    <style>
-        :root {
-            --primary: #D4AF37; /* Dorado elegante */
-            --dark: #1a1a1a;
-            --light: #f9f9f9;
-            --success: #25D366; /* Verde WhatsApp */
-        }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--light); margin: 0; padding-bottom: 80px; color: var(--dark); }
-        
-        /* Header */
-        header { background: white; padding: 20px 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        h1 { margin: 0; font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase; }
-        .subtitle { color: var(--primary); font-weight: 600; margin-top: 5px; font-size: 0.9rem; }
-        
-        /* Navegación de Categorías */
-        .nav-scroller { display: flex; overflow-x: auto; gap: 10px; padding: 15px; background: white; border-bottom: 1px solid #eee; -webkit-overflow-scrolling: touch; }
-        .cat-btn {
-            border: 1px solid #ddd; background: white; padding: 8px 18px; border-radius: 20px; 
-            cursor: pointer; white-space: nowrap; font-size: 0.9rem; transition: all 0.3s ease;
-        }
-        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo KAFLOCA STORE</title>
 
-        /* Contenedor Principal */
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-        
-        /* Grilla de Productos */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Tarjetas adaptables */
-            gap: 15px;
-        }
-        @media(min-width: 768px) { .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; } }
+<style>
+:root{
+--primary:#D4AF37;
+--dark:#1a1a1a;
+--light:#f9f9f9;
+--success:#25D366;
+}
 
-        /* Tarjeta de Producto */
-        .card {
-            background: white; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05); transition: transform 0.2s;
-            display: flex; flex-direction: column; height: 100%;
-        }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        
-        .card-img-wrapper {
-            position: relative; width: 100%; padding-top: 100%; /* Aspect ratio 1:1 */
-            background: #f0f0f0; overflow: hidden;
-        }
-        .card-img {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; transition: opacity 0.3s;
-        }
-        
-        /* Placeholder por si falta imagen */
-        .no-img-placeholder {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: #aaa; background: #eee;
-        }
+body{
+font-family:'Segoe UI',system-ui,sans-serif;
+background:var(--light);
+margin:0;
+padding-bottom:80px;
+color:var(--dark);
+}
 
-        .card-info { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; }
-        .card-code { font-size: 0.75rem; color: #888; font-weight: bold; margin-bottom: 4px; }
-        .card-title { font-size: 1rem; margin: 0 0 5px; line-height: 1.3; color: var(--dark); }
-        .card-desc { font-size: 0.8rem; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
-        
-        .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
-        .price { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
-        .add-btn {
-            background: var(--dark); color: white; border: none; width: 35px; height: 35px;
-            border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex;
-            align-items: center; justify-content: center; transition: background 0.2s;
-        }
-        .add-btn:hover { background: var(--primary); }
+/* ===== Banner ===== */
+.discount-banner{
+background:linear-gradient(90deg,#D4AF37,#b8962e);
+color:#fff;
+text-align:center;
+padding:12px;
+font-weight:bold;
+font-size:.95rem;
+letter-spacing:.5px;
+}
 
-        /* Botón Flotante Carrito */
-        .fab-cart {
-            position: fixed; bottom: 25px; right: 25px; background: var(--primary); color: white;
-            padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
-            cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 10px;
-            z-index: 1000; animation: popIn 0.3s;
-        }
-        @keyframes popIn { from {transform: scale(0);} to {transform: scale(1);} }
+/* Header */
+header{
+background:white;
+padding:20px 10px;
+text-align:center;
+box-shadow:0 2px 10px rgba(0,0,0,0.05);
+position:sticky;
+top:0;
+z-index:100;
+}
 
-        /* Modal */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end; justify-content: center;
-        }
-        @media(min-width: 768px) { .modal-overlay { align-items: center; } }
+h1{margin:0;font-size:1.8rem;letter-spacing:2px;text-transform:uppercase;}
+.subtitle{color:var(--primary);font-weight:600;margin-top:5px;font-size:.9rem;}
 
-        .modal-content {
-            background: white; width: 100%; max-width: 500px; padding: 25px;
-            border-radius: 20px 20px 0 0; max-height: 85vh; overflow-y: auto;
-            position: relative; animation: slideUp 0.3s;
-        }
-        @media(min-width: 768px) { .modal-content { border-radius: 15px; } }
-        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
+/* Navegación */
+.nav-scroller{
+display:flex;
+overflow-x:auto;
+gap:10px;
+padding:15px;
+background:white;
+border-bottom:1px solid #eee;
+}
 
-        .cart-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .cart-item-info strong { display: block; font-size: 0.95rem; }
-        .cart-item-info small { color: #888; }
-        .remove-link { color: #ff4d4d; font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
+.cat-btn{
+border:1px solid #ddd;
+background:white;
+padding:8px 18px;
+border-radius:20px;
+cursor:pointer;
+white-space:nowrap;
+font-size:.9rem;
+transition:.3s;
+}
 
-        .form-group { margin-bottom: 15px; }
-        .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
-        
-        .btn-block { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
-        .btn-whatsapp { background: var(--success); color: white; }
-        .btn-email { background: #333; color: white; }
-        
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #999; }
-    </style>
+.cat-btn.active{
+background:var(--primary);
+color:white;
+border-color:var(--primary);
+transform:scale(1.05);
+}
+
+/* Contenedor */
+.container{max-width:1200px;margin:20px auto;padding:0 15px;}
+
+.product-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+gap:15px;
+}
+
+@media(min-width:768px){
+.product-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:25px;}
+}
+
+/* Tarjeta */
+.card{
+background:white;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 3px 10px rgba(0,0,0,.05);
+transition:.2s;
+display:flex;
+flex-direction:column;
+height:100%;
+}
+
+.card:hover{
+transform:translateY(-5px);
+box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+.card-info{padding:12px;display:flex;flex-direction:column;flex-grow:1;}
+
+.card-code{font-size:.75rem;color:#888;font-weight:bold;margin-bottom:4px;}
+.card-title{font-size:1rem;margin:0 0 5px;line-height:1.3;}
+.card-desc{font-size:.8rem;color:#666;margin-bottom:10px;}
+
+.card-footer{
+margin-top:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.price{font-size:1.1rem;font-weight:700;color:var(--primary);}
+
+.add-btn{
+background:var(--dark);
+color:white;
+border:none;
+width:35px;
+height:35px;
+border-radius:50%;
+cursor:pointer;
+font-size:1.2rem;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.add-btn:hover{background:var(--primary);}
+
+/* FAB */
+.fab-cart{
+position:fixed;
+bottom:25px;
+right:25px;
+background:var(--primary);
+color:white;
+padding:15px 25px;
+border-radius:50px;
+box-shadow:0 4px 20px rgba(212,175,55,.4);
+cursor:pointer;
+font-weight:bold;
+display:flex;
+gap:10px;
+z-index:1000;
+}
+
+/* Modal */
+.modal-overlay{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,.5);
+z-index:2000;
+align-items:flex-end;
+justify-content:center;
+}
+
+.modal-content{
+background:white;
+width:100%;
+max-width:500px;
+padding:25px;
+border-radius:20px 20px 0 0;
+max-height:85vh;
+overflow-y:auto;
+position:relative;
+}
+
+.close-modal{
+position:absolute;
+top:15px;
+right:20px;
+font-size:1.5rem;
+cursor:pointer;
+color:#999;
+}
+
+.cart-item{
+display:flex;
+justify-content:space-between;
+padding:12px 0;
+border-bottom:1px solid #eee;
+}
+
+.remove-link{
+color:#ff4d4d;
+font-size:.8rem;
+cursor:pointer;
+text-decoration:underline;
+}
+
+.strike{
+text-decoration:line-through;
+color:#999;
+font-size:.9rem;
+}
+
+.discount-line{
+color:#D4AF37;
+font-weight:bold;
+margin-top:8px;
+}
+
+.progress-msg{
+margin-top:10px;
+font-size:.85rem;
+color:#666;
+text-align:center;
+}
+
+.btn-block{
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+font-size:1rem;
+cursor:pointer;
+margin-top:10px;
+}
+
+.btn-whatsapp{background:var(--success);color:white;}
+.btn-email{background:#333;color:white;}
+
+</style>
 </head>
+
 <body>
 
-<header>
-    <h1>KAFLOCA STORE</h1>
-    <div class="subtitle">Catálogo Digital</div>
-</header>
-
-<div class="nav-scroller">
-    <button class="cat-btn active" onclick="filterProducts('all')">Todos</button>
-    <button class="cat-btn" onclick="filterProducts('Anillos')">Anillos</button>
-    <button class="cat-btn" onclick="filterProducts('Aretes')">Aretes</button>
-    <button class="cat-btn" onclick="filterProducts('Collares')">Collares</button>
-    <button class="cat-btn" onclick="filterProducts('Pulseras')">Pulseras</button>
-    <button class="cat-btn" onclick="filterProducts('Tobilleras')">Tobilleras</button>
-    <button class="cat-btn" onclick="filterProducts('Sets')">Conjuntos</button>
+<div class="discount-banner">
+🎉 ¡Obtén 15% de descuento al comprar 5 o más productos!
 </div>
 
+<header>
+<h1>KAFLOCA STORE</h1>
+<div class="subtitle">Catálogo Digital</div>
+</header>
+
 <div class="container">
-    <div class="product-grid" id="grid">
-        </div>
+<div class="product-grid" id="grid"></div>
 </div>
 
 <div class="fab-cart" onclick="toggleCart()">
-    <span>🛒</span>
-    <span id="cart-total-badge">₡0</span>
+🛒 <span id="cart-total-badge">0</span>
 </div>
 
 <div class="modal-overlay" id="cart-modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="toggleCart()">&times;</span>
-        <h2 style="margin-top: 0">Tu Pedido</h2>
-        
-        <div id="cart-list">
-            <p style="text-align: center; color: #999;">El carrito está vacío.</p>
-        </div>
+<div class="modal-content">
+<span class="close-modal" onclick="toggleCart()">&times;</span>
+<h2>Tu Pedido</h2>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0; font-size: 1.2rem; font-weight: bold;">
-            <span>Total:</span>
-            <span style="color: var(--primary);">₡<span id="cart-final-total">0</span></span>
-        </div>
+<div id="cart-list"></div>
 
-        <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+<div style="margin:20px 0;font-size:1.2rem;font-weight:bold;">
+Total: ₡<span id="cart-final-total">0</span>
+</div>
 
-        <div class="form-group">
-            <input type="text" id="client-name" class="form-control" placeholder="Tu Nombre Completo">
-        </div>
-        <div class="form-group">
-            <input type="tel" id="client-phone" class="form-control" placeholder="Teléfono / WhatsApp">
-        </div>
-        <div class="form-group">
-            <textarea id="client-address" class="form-control" placeholder="Dirección de Envío o Notas Adicionales" rows="2"></textarea>
-        </div>
+<button class="btn-block btn-whatsapp" onclick="checkout('whatsapp')">
+Enviar por WhatsApp
+</button>
 
-        <button class="btn-block btn-whatsapp" onclick="checkout('whatsapp')">Enviar Pedido por WhatsApp</button>
-        <button class="btn-block btn-email" onclick="checkout('email')">Enviar Pedido por Correo</button>
-    </div>
+<button class="btn-block btn-email" onclick="checkout('email')">
+Enviar por Correo
+</button>
+
+</div>
 </div>
 
 <script>
-    /* =====================================================
-       CONFIGURACIÓN DE LA TIENDA
-       ===================================================== */
-    const STORE_WHATSAPP = "50684107482"; // Número sin símbolos
-    const STORE_EMAIL = "floryta_81@hotmail.com"; // Tu correo real
-    
-    // BASE DE DATOS COMPLETA DE PRODUCTOS
-    // Nota: Se han corregido precios erróneos (ej: 43500 -> 3500)
-    const products = [
-        // ANILLOS
+const STORE_WHATSAPP="50684107482";
+const STORE_EMAIL="floryta_81@hotmail.com";
+
+let cart=[];
+
+/* 👉 Aquí debes pegar tu arreglo completo de productos */
+const products=[ // ANILLOS
         {id:"AN-01", n:"Anillo Geo Verde", p:3500, c:"Anillos", d:"Acero 304, chapado oro 18k, resistente al agua."},
         {id:"AN-02", n:"Anillo Ondulado", p:2500, c:"Anillos", d:"Acero 316, PVD geométrico, resistente al deslustre."},
         {id:"AN-03", n:"Anillo Geo Beige", p:3500, c:"Anillos", d:"Acero 304, chapado oro 18k, geométrico estilo IG."},
@@ -357,143 +457,136 @@
         {id:"CO-05", n:"Set Corazón Doble Dorado", p:4500, c:"Sets", d:"Collar y pulsera chapado oro 18k."},
         {id:"CO-06", n:"Set Corazón Doble Plateado", p:4200, c:"Sets", d:"Collar y pulsera chapado oro 18k."},
         {id:"CO-07", n:"Set Flor Negra", p:2500, c:"Sets", d:"3 piezas flor negra gota de aceite."},
-        {id:"CO-08", n:"Set Flor Blanca", p:2500, c:"Sets", d:"3 piezas flor blanca gota de aceite."}
-    ];
+        {id:"CO-08", n:"Set Flor Blanca", p:2500, c:"Sets", d:"3 piezas flor blanca gota de aceite."}];
 
-    let cart = [];
+/* ============================ */
 
-    // Cargar productos
-    function loadProducts(category = 'all') {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
-        
-        const filtered = category === 'all' 
-            ? products 
-            : products.filter(p => p.c === category);
+function loadProducts(){
+const grid=document.getElementById("grid");
+grid.innerHTML="";
+products.forEach(p=>{
+const card=document.createElement("div");
+card.className="card";
+card.innerHTML=`
+<div class="card-info">
+<span class="card-code">${p.id}</span>
+<h3 class="card-title">${p.n}</h3>
+<p class="card-desc">${p.d}</p>
+<div class="card-footer">
+<span class="price">₡${p.p.toLocaleString()}</span>
+<button class="add-btn" onclick="addToCart('${p.id}')">+</button>
+</div>
+</div>`;
+grid.appendChild(card);
+});
+}
 
-        filtered.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            
-            // Lógica de Imagen: Intenta cargar img/ID.jpg, si falla muestra placeholder
-            const imgPath = `img/${p.id}.jpg`;
-            
-            card.innerHTML = `
-                <div class="card-img-wrapper">
-                    <img src="${imgPath}" class="card-img" alt="${p.n}" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                    <div class="no-img-placeholder" style="display:none">
-                        <span style="font-size:2rem; margin-bottom:10px">💎</span>
-                        <span>${p.id}</span>
-                        <small style="margin-top:5px; font-size:0.7rem">Sin foto</small>
-                    </div>
-                </div>
-                <div class="card-info">
-                    <span class="card-code">${p.id}</span>
-                    <h3 class="card-title">${p.n}</h3>
-                    <p class="card-desc">${p.d}</p>
-                    <div class="card-footer">
-                        <span class="price">₡${p.p.toLocaleString()}</span>
-                        <button class="add-btn" onclick="addToCart('${p.id}')">+</button>
-                    </div>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-        
-        // Manejar estado activo de botones
-        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-        if(event) event.target.classList.add('active');
-        else document.querySelector('.cat-btn').classList.add('active');
-    }
+function addToCart(id){
+const product=products.find(p=>p.id===id);
+cart.push(product);
+updateCartDisplay();
+}
 
-    function filterProducts(cat) { loadProducts(cat); }
+function removeFromCart(index){
+cart.splice(index,1);
+updateCartDisplay();
+}
 
-    function addToCart(id) {
-        const product = products.find(p => p.id === id);
-        cart.push(product);
-        updateCartDisplay();
-        
-        // Efecto visual en botón flotante
-        const fab = document.querySelector('.fab-cart');
-        fab.style.transform = "scale(1.2)";
-        setTimeout(() => fab.style.transform = "scale(1)", 200);
-    }
+function updateCartDisplay(){
 
-    function removeFromCart(index) {
-        cart.splice(index, 1);
-        updateCartDisplay();
-    }
+document.getElementById("cart-total-badge").innerText=cart.length;
 
-    function updateCartDisplay() {
-        // Actualizar contador
-        document.getElementById('cart-total-badge').innerText = cart.length;
-        
-        // Calcular total
-        const total = cart.reduce((sum, item) => sum + item.p, 0);
-        document.getElementById('cart-final-total').innerText = total.toLocaleString();
-        
-        // Renderizar lista
-        const list = document.getElementById('cart-list');
-        if(cart.length === 0) {
-            list.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">El carrito está vacío.</p>';
-        } else {
-            list.innerHTML = cart.map((item, index) => `
-                <div class="cart-item">
-                    <div class="cart-item-info">
-                        <strong>${item.n}</strong>
-                        <small>${item.id}</small>
-                    </div>
-                    <div style="text-align:right">
-                        <div>₡${item.p.toLocaleString()}</div>
-                        <span class="remove-link" onclick="removeFromCart(${index})">Eliminar</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
+const subtotal=cart.reduce((sum,item)=>sum+item.p,0);
 
-    function toggleCart() {
-        const modal = document.getElementById('cart-modal');
-        modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-    }
+let discount=0;
+let finalTotal=subtotal;
 
-    function checkout(method) {
-        if(cart.length === 0) return alert("Tu carrito está vacío.");
-        
-        const name = document.getElementById('client-name').value;
-        const phone = document.getElementById('client-phone').value;
-        const address = document.getElementById('client-address').value;
+if(cart.length>=5){
+discount=subtotal*0.15;
+finalTotal=subtotal-discount;
+}
 
-        if(!name) return alert("Por favor ingresa tu nombre.");
+document.getElementById("cart-final-total").innerText=finalTotal.toLocaleString();
 
-        let msg = `Hola KAFLOCA STORE, soy ${name}. Deseo ordenar lo siguiente:\n\n`;
-        let total = 0;
-        
-        cart.forEach(item => {
-            msg += `▪ ${item.n} (${item.id}): ₡${item.p.toLocaleString()}\n`;
-            total += item.p;
-        });
-        
-        msg += `\n*TOTAL: ₡${total.toLocaleString()}*`;
-        if(phone) msg += `\nTeléfono: ${phone}`;
-        if(address) msg += `\nDirección: ${address}`;
+const list=document.getElementById("cart-list");
 
-        if(method === 'whatsapp') {
-            window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
-        } else {
-            window.location.href = `mailto:${STORE_EMAIL}?subject=Nuevo Pedido de ${name}&body=${encodeURIComponent(msg)}`;
-        }
-    }
+if(cart.length===0){
+list.innerHTML="<p style='text-align:center;color:#999'>El carrito está vacío.</p>";
+return;
+}
 
-    // Inicializar
-    document.addEventListener('DOMContentLoaded', () => {
-        loadProducts();
-        updateCartDisplay();
-    });
+list.innerHTML=cart.map((item,index)=>`
+<div class="cart-item">
+<div>
+<strong>${item.n}</strong><br>
+<small>${item.id}</small>
+</div>
+<div style="text-align:right">
+₡${item.p.toLocaleString()}<br>
+<span class="remove-link" onclick="removeFromCart(${index})">Eliminar</span>
+</div>
+</div>
+`).join("");
+
+if(cart.length>=5){
+list.innerHTML+=`
+<div class="discount-line">
+Subtotal: <span class="strike">₡${subtotal.toLocaleString()}</span><br>
+Descuento 15%: -₡${discount.toLocaleString()}
+</div>`;
+}else{
+const faltan=5-cart.length;
+list.innerHTML+=`
+<div class="progress-msg">
+Agrega ${faltan} producto(s) más y obtén 15% de descuento 🎉
+</div>`;
+}
+}
+
+function toggleCart(){
+const modal=document.getElementById("cart-modal");
+modal.style.display=modal.style.display==="flex"?"none":"flex";
+}
+
+function checkout(method){
+
+if(cart.length===0){alert("Tu carrito está vacío.");return;}
+
+let subtotal=cart.reduce((sum,item)=>sum+item.p,0);
+let discount=0;
+let finalTotal=subtotal;
+
+if(cart.length>=5){
+discount=subtotal*0.15;
+finalTotal=subtotal-discount;
+}
+
+let msg="Hola KAFLOCA STORE, deseo ordenar:\n\n";
+
+cart.forEach(item=>{
+msg+=`▪ ${item.n} (${item.id}) ₡${item.p.toLocaleString()}\n`;
+});
+
+if(discount>0){
+msg+=`\nDescuento 15%: -₡${discount.toLocaleString()}\n`;
+}
+
+msg+=`\nTOTAL: ₡${finalTotal.toLocaleString()}`;
+
+if(method==="whatsapp"){
+window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
+}else{
+window.location.href=`mailto:${STORE_EMAIL}?subject=Nuevo Pedido&body=${encodeURIComponent(msg)}`;
+}
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+loadProducts();
+updateCartDisplay();
+});
 </script>
 
 </body>
 </html>
-
-
+   
+ 
